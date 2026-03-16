@@ -83,7 +83,8 @@ public class ScraperService {
             if (vagaElements.isEmpty()) {
                 log.warn("Nenhum card encontrado. Verifique se os seletores CSS estão corretos para o site alvo.");
                 log.debug("HTML title: {}", doc.title());
-                log.debug("HTML body preview: {}", doc.body().text().substring(0, Math.min(500, doc.body().text().length())));
+                String bodyText = doc.body() != null ? doc.body().text() : "";
+                log.debug("HTML body preview: {}", bodyText.substring(0, Math.min(500, bodyText.length())));
                 return vagasSalvas;
             }
 

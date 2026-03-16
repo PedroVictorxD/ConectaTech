@@ -46,7 +46,7 @@ public class AdminController {
 
     // === Vagas ===
 
-    @GetMapping("/importar-scraper")
+    @PostMapping("/importar-scraper")
     public ResponseEntity<Map<String, Object>> importarScraper() {
         List<Vaga> vagas = scraperService.executarScraping();
         return ResponseEntity.ok(Map.of(

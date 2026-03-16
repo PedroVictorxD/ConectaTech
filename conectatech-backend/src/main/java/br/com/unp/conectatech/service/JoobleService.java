@@ -57,6 +57,7 @@ public class JoobleService {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(apiUrl + apiKey))
                     .header("Content-Type", "application/json")
+                    .timeout(Duration.ofSeconds(30))
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
