@@ -47,9 +47,12 @@ public class AdminController {
     // === Vagas ===
 
     @GetMapping("/importar-scraper")
-    public ResponseEntity<Map<String, String>> importarScraper() {
-        scraperService.executarScrapingAgendado();
-        return ResponseEntity.ok(Map.of("message", "Scraping executado. Verifique as vagas."));
+    public ResponseEntity<Map<String, Object>> importarScraper() {
+        List<Vaga> vagas = scraperService.executarScraping();
+        return ResponseEntity.ok(Map.of(
+                "message", "Scraping executado",
+                "vagasImportadas", vagas.size()
+        ));
     }
 
     @PostMapping("/importar-jooble")
