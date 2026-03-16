@@ -1,10 +1,9 @@
 package br.com.unp.conectatech.controller;
 
-import br.com.unp.conectatech.dto.AlterarSenhaRequest;
-import br.com.unp.conectatech.dto.LoginRequest;
-import br.com.unp.conectatech.dto.LoginResponse;
-import br.com.unp.conectatech.dto.RecuperarSenhaRequest;
+import br.com.unp.conectatech.dto.*;
+import br.com.unp.conectatech.model.Usuario;
 import br.com.unp.conectatech.service.AuthService;
+import br.com.unp.conectatech.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +15,19 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final UsuarioService usuarioService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, UsuarioService usuarioService) {
         this.authService = authService;
+        this.usuarioService = usuarioService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UsuarioDTO> register(@Valid @RequestBody RegistroRequest request) {
+        Usuario usuario = authService.registrar(
+                request.getNome(), request.getEmail(), request.getSenha(),
+                request.getCurso(), request.getPeriodo());
+        return ResponseEntity.ok(usuarioService.toDTO(usuario));
     }
 
     @PostMapping("/login")
