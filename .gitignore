@@ -1,0 +1,18 @@
+# === Imagens e screenshots avulsos ===
+*.png
+*.jpg
+*.jpeg
+
+# === OS ===
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# === IDE ===
+.idea/
+.vscode/
+*.iml
+
+# === Logs ===
+*.log
