@@ -26,10 +26,13 @@ public class VagaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<VagaDTO>> listarTodas(@RequestParam(required = false) String busca) {
+    public ResponseEntity<List<VagaDTO>> listarTodas(
+            @RequestParam(required = false) String busca,
+            @RequestParam(required = false) String localizacao,
+            @RequestParam(required = false) String fonte) {
         List<VagaDTO> vagas;
-        if (busca != null && !busca.isBlank()) {
-            vagas = vagaService.buscarPorTitulo(busca);
+        if ((busca != null && !busca.isBlank()) || (localizacao != null && !localizacao.isBlank()) || (fonte != null && !fonte.isBlank())) {
+            vagas = vagaService.buscarComFiltros(busca, localizacao, fonte);
         } else {
             vagas = vagaService.listarTodas();
         }
