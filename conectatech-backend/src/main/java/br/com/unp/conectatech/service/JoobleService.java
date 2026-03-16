@@ -14,6 +14,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -37,11 +38,18 @@ public class JoobleService {
     public JoobleService(VagaRepository vagaRepository) {
         this.vagaRepository = vagaRepository;
         this.objectMapper = new ObjectMapper();
-        this.httpClient = HttpClient.newHttpClient();
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
     }
 
     public List<Vaga> buscarVagasJooble(String keywords, String location) {
         List<Vaga> vagasSalvas = new ArrayList<>();
+
+        if (apiKey == null || apiKey.isBlank() || apiKey.equals("SUA_CHAVE_JOOBLE_AQUI")) {
+            log.warn("Jooble API key não configurada. Configure 'jooble.api.key' no application.properties ou a variável de ambiente JOOBLE_API_KEY.");
+            return vagasSalvas;
+        }
 
         try {
             String requestBody = objectMapper.writeValueAsString(new JoobleRequest(keywords, location));
