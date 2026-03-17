@@ -19,11 +19,13 @@ public interface VagaRepository extends JpaRepository<Vaga, Long> {
     boolean existsByUrl(String url);
 
     @Query("SELECT v FROM Vaga v WHERE " +
-           "(COALESCE(:titulo, '') = '' OR LOWER(v.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))) AND " +
+           "(COALESCE(:busca, '') = '' OR (LOWER(v.titulo) LIKE LOWER(CONCAT('%', :busca, '%')) " +
+           "OR LOWER(v.empresa) LIKE LOWER(CONCAT('%', :busca, '%')) " +
+           "OR LOWER(v.descricao) LIKE LOWER(CONCAT('%', :busca, '%')))) AND " +
            "(COALESCE(:localizacao, '') = '' OR LOWER(v.localizacao) LIKE LOWER(CONCAT('%', :localizacao, '%'))) AND " +
            "(:fonte IS NULL OR v.fonte = :fonte)")
     List<Vaga> buscarComFiltros(
-            @Param("titulo") String titulo,
+            @Param("busca") String busca,
             @Param("localizacao") String localizacao,
             @Param("fonte") FonteVaga fonte);
 }
