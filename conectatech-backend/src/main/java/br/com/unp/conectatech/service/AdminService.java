@@ -27,8 +27,6 @@ public class AdminService {
         this.vagaService = vagaService;
     }
 
-    // === Gerenciamento de Usuários ===
-
     public List<UsuarioDTO> listarUsuarios() {
         return usuarioRepository.findAll().stream()
                 .map(usuarioService::toDTO)
@@ -55,8 +53,6 @@ public class AdminService {
 
         return usuarioService.toDTO(usuarioRepository.save(usuario));
     }
-
-    // === Gerenciamento de Vagas ===
 
     public List<VagaDTO> listarVagas() {
         return vagaService.listarTodas();

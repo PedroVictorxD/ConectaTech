@@ -34,8 +34,6 @@ public class AdminController {
         this.joobleService = joobleService;
     }
 
-    // === Usuarios ===
-
     @GetMapping("/usuarios")
     @Operation(summary = "Listar usuarios", description = "Retorna todos os usuarios cadastrados")
     @ApiResponses({
@@ -68,8 +66,6 @@ public class AdminController {
             @RequestBody UsuarioDTO dto) {
         return ResponseEntity.ok(adminService.atualizarUsuario(id, dto));
     }
-
-    // === Vagas ===
 
     @PostMapping("/importar-scraper")
     @Operation(summary = "Executar scraping", description = "Executa o scraper manualmente para importar vagas de sites externos")

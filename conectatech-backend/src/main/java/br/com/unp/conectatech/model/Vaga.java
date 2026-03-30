@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * Entidade que representa uma vaga de estágio.
- */
 @Entity
 @Table(name = "vagas")
 @Data

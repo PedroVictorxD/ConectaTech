@@ -83,7 +83,6 @@ public class VagaService {
             try {
                 fonteEnum = FonteVaga.valueOf(fonte.toUpperCase());
             } catch (IllegalArgumentException e) {
-                // fonte inválida, ignora filtro
             }
         }
         return vagaRepository.buscarComFiltros(
