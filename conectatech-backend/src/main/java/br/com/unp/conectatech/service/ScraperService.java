@@ -26,81 +26,109 @@ public class ScraperService {
     @Value("${scraper.enabled}")
     private boolean scraperEnabled;
 
+    @Value("${scraper.target.url}")
+    private String targetUrl;
+
+    @Value("${scraper.target.card-selector}")
+    private String cardSelector;
+
+    @Value("${scraper.target.title-selector}")
+    private String titleSelector;
+
+    @Value("${scraper.target.company-selector}")
+    private String companySelector;
+
+    @Value("${scraper.target.description-selector:p}")
+    private String descriptionSelector;
+
+    @Value("${scraper.target.location-selector}")
+    private String locationSelector;
+
+    @Value("${scraper.target.link-selector:a}")
+    private String linkSelector;
+
+    @Value("${scraper.target.cidade:Mossoró}")
+    private String cidadePadrao;
+
     public ScraperService(VagaRepository vagaRepository) {
         this.vagaRepository = vagaRepository;
     }
 
-    /**
-     * Execução agendada via cron (padrão: diariamente às 6h).
-     * Configurável por scraper.cron no application.properties.
-     */
     @Scheduled(cron = "${scraper.cron}")
     public void executarScrapingAgendado() {
         if (!scraperEnabled) {
             log.info("Scraper desabilitado. Pulando execução agendada.");
             return;
         }
-
         log.info("Iniciando scraping agendado...");
-
-        // Exemplo: scraping do CIEE para vagas de estágio
-        List<Vaga> vagas = scrapeCiee("Mossoró");
+        List<Vaga> vagas = executarScraping();
         log.info("Scraping concluído. {} vagas importadas.", vagas.size());
     }
 
-    /**
-     * Scraping de vagas do CIEE (exemplo de implementação).
-     * Adapte os seletores CSS conforme a estrutura real do site alvo.
-     */
-    public List<Vaga> scrapeCiee(String cidade) {
+    public List<Vaga> executarScraping() {
         List<Vaga> vagasSalvas = new ArrayList<>();
-        String url = "https://portal.ciee.org.br/estudantes/vagas/?cidade=" + cidade;
 
         try {
-            Document doc = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36")
-                    .timeout(10000)
+            log.info("Scraping URL: {}", targetUrl);
+
+            Document doc = Jsoup.connect(targetUrl)
+                    .userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                    .timeout(15000)
+                    .followRedirects(true)
                     .get();
 
-            // Seletores CSS genéricos — devem ser adaptados ao site real
-            Elements vagaElements = doc.select(".vaga-card, .job-listing, .vacancy-item, article.vaga");
+            Elements vagaElements = doc.select(cardSelector);
+            log.info("Encontrados {} cards com seletor '{}'", vagaElements.size(), cardSelector);
+
+            if (vagaElements.isEmpty()) {
+                log.warn("Nenhum card encontrado. Verifique se os seletores CSS estão corretos para o site alvo.");
+                log.debug("HTML title: {}", doc.title());
+                String bodyText = doc.body() != null ? doc.body().text() : "";
+                log.debug("HTML body preview: {}", bodyText.substring(0, Math.min(500, bodyText.length())));
+                return vagasSalvas;
+            }
 
             for (Element element : vagaElements) {
-                String titulo = extractText(element, ".titulo, .job-title, h2, h3");
-                String empresa = extractText(element, ".empresa, .company-name, .employer");
-                String descricao = extractText(element, ".descricao, .job-description, .snippet, p");
-                String localizacao = extractText(element, ".localizacao, .location, .city");
-                String link = extractLink(element, "a");
+                String titulo = extractText(element, titleSelector);
+                String empresa = extractText(element, companySelector);
+                String descricao = extractText(element, descriptionSelector);
+                String localizacao = extractText(element, locationSelector);
+                String link = extractLink(element, linkSelector);
 
-                if (titulo.isEmpty() || link.isEmpty())
+                if (titulo.isEmpty()) {
+                    log.debug("Card ignorado: título vazio");
                     continue;
+                }
+
+                if (link.isEmpty()) {
+                    link = targetUrl + "#" + titulo.hashCode();
+                }
 
                 if (!vagaRepository.existsByUrl(link)) {
                     Vaga vaga = Vaga.builder()
                             .titulo(titulo)
                             .empresa(empresa.isEmpty() ? "Empresa não informada" : empresa)
                             .descricao(descricao)
-                            .localizacao(localizacao.isEmpty() ? cidade : localizacao)
+                            .localizacao(localizacao.isEmpty() ? cidadePadrao : localizacao)
                             .url(link)
                             .fonte(FonteVaga.JSOUP)
                             .build();
 
                     vagasSalvas.add(vagaRepository.save(vaga));
+                    log.debug("Vaga salva: {}", titulo);
                 }
             }
 
-            log.info("CIEE: {} vagas encontradas para cidade='{}'", vagasSalvas.size(), cidade);
+            log.info("Scraping finalizado: {} novas vagas salvas de {} cards encontrados",
+                    vagasSalvas.size(), vagaElements.size());
 
         } catch (Exception e) {
-            log.error("Erro ao fazer scraping do CIEE: {}", e.getMessage(), e);
+            log.error("Erro ao fazer scraping de '{}': {}", targetUrl, e.getMessage(), e);
         }
 
         return vagasSalvas;
     }
 
-    /**
-     * Extrai texto do primeiro elemento que corresponda aos seletores CSS.
-     */
     private String extractText(Element parent, String selectors) {
         for (String selector : selectors.split(",")) {
             Element el = parent.selectFirst(selector.trim());
@@ -111,9 +139,6 @@ public class ScraperService {
         return "";
     }
 
-    /**
-     * Extrai URL do primeiro link encontrado no elemento.
-     */
     private String extractLink(Element parent, String selector) {
         Element link = parent.selectFirst(selector);
         if (link != null) {

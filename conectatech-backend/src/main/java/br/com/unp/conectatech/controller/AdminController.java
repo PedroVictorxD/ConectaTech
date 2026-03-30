@@ -2,7 +2,10 @@ package br.com.unp.conectatech.controller;
 
 import br.com.unp.conectatech.dto.UsuarioDTO;
 import br.com.unp.conectatech.dto.VagaDTO;
+import br.com.unp.conectatech.model.Vaga;
 import br.com.unp.conectatech.service.AdminService;
+import br.com.unp.conectatech.service.JoobleService;
+import br.com.unp.conectatech.service.ScraperService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +17,13 @@ import java.util.Map;
 public class AdminController {
 
     private final AdminService adminService;
+    private final ScraperService scraperService;
+    private final JoobleService joobleService;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, ScraperService scraperService, JoobleService joobleService) {
         this.adminService = adminService;
+        this.scraperService = scraperService;
+        this.joobleService = joobleService;
     }
 
     // === Usuários ===
@@ -38,6 +45,26 @@ public class AdminController {
     }
 
     // === Vagas ===
+
+    @PostMapping("/importar-scraper")
+    public ResponseEntity<Map<String, Object>> importarScraper() {
+        List<Vaga> vagas = scraperService.executarScraping();
+        return ResponseEntity.ok(Map.of(
+                "message", "Scraping executado",
+                "vagasImportadas", vagas.size()
+        ));
+    }
+
+    @PostMapping("/importar-jooble")
+    public ResponseEntity<Map<String, Object>> importarJooble(
+            @RequestParam(defaultValue = "estágio tecnologia") String keywords,
+            @RequestParam(defaultValue = "Mossoró, RN") String location) {
+        List<Vaga> vagas = joobleService.buscarVagasJooble(keywords, location);
+        return ResponseEntity.ok(Map.of(
+                "message", "Importação Jooble concluída",
+                "vagasImportadas", vagas.size()
+        ));
+    }
 
     @GetMapping("/vagas")
     public ResponseEntity<List<VagaDTO>> listarVagas() {

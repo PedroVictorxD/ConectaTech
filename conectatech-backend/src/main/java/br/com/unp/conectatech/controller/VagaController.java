@@ -1,6 +1,7 @@
 package br.com.unp.conectatech.controller;
 
 import br.com.unp.conectatech.dto.VagaDTO;
+import br.com.unp.conectatech.service.JoobleService;
 import br.com.unp.conectatech.service.VagaSelecionadaService;
 import br.com.unp.conectatech.service.VagaService;
 import org.springframework.http.ResponseEntity;
@@ -16,17 +17,36 @@ public class VagaController {
 
     private final VagaService vagaService;
     private final VagaSelecionadaService vagaSelecionadaService;
+    private final JoobleService joobleService;
 
-    public VagaController(VagaService vagaService, VagaSelecionadaService vagaSelecionadaService) {
+    public VagaController(VagaService vagaService, VagaSelecionadaService vagaSelecionadaService, JoobleService joobleService) {
         this.vagaService = vagaService;
         this.vagaSelecionadaService = vagaSelecionadaService;
+        this.joobleService = joobleService;
     }
 
     @GetMapping
-    public ResponseEntity<List<VagaDTO>> listarTodas(@RequestParam(required = false) String busca) {
+    public ResponseEntity<List<VagaDTO>> listarTodas(
+            @RequestParam(required = false) String busca,
+            @RequestParam(required = false) String localizacao,
+            @RequestParam(required = false) String fonte) {
         List<VagaDTO> vagas;
-        if (busca != null && !busca.isBlank()) {
-            vagas = vagaService.buscarPorTitulo(busca);
+        if ((busca != null && !busca.isBlank()) || (localizacao != null && !localizacao.isBlank()) || (fonte != null && !fonte.isBlank())) {
+            vagas = vagaService.buscarComFiltros(busca, localizacao, fonte);
+        } else {
+            vagas = vagaService.listarTodas();
+        }
+        return ResponseEntity.ok(vagas);
+    }
+
+    @GetMapping("/buscar-externas")
+    public ResponseEntity<List<VagaDTO>> buscarExternas(
+            @RequestParam(defaultValue = "estágio") String keywords,
+            @RequestParam(defaultValue = "Mossoró, RN") String location) {
+        joobleService.buscarVagasJooble(keywords, location);
+        List<VagaDTO> vagas;
+        if (!keywords.isBlank()) {
+            vagas = vagaService.buscarPorTitulo(keywords);
         } else {
             vagas = vagaService.listarTodas();
         }

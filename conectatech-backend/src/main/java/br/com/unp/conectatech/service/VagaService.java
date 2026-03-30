@@ -77,6 +77,22 @@ public class VagaService {
         vagaRepository.deleteById(id);
     }
 
+    public List<VagaDTO> buscarComFiltros(String titulo, String localizacao, String fonte) {
+        FonteVaga fonteEnum = null;
+        if (fonte != null && !fonte.isBlank()) {
+            try {
+                fonteEnum = FonteVaga.valueOf(fonte.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // fonte inválida, ignora filtro
+            }
+        }
+        return vagaRepository.buscarComFiltros(
+                titulo != null && titulo.isBlank() ? null : titulo,
+                localizacao != null && localizacao.isBlank() ? null : localizacao,
+                fonteEnum
+        ).stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
     public VagaDTO toDTO(Vaga vaga) {
         return VagaDTO.builder()
                 .id(vaga.getId())
