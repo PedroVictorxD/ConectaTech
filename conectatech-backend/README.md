@@ -31,6 +31,36 @@ cd conectatech-backend
 
 A API estará disponível em `http://localhost:8080`.
 
+## Configuracao
+
+### Desenvolvimento (padrao)
+
+Basta rodar `./mvnw spring-boot:run`. O profile `dev` eh ativado automaticamente com valores locais.
+
+### Producao
+
+Defina as variaveis de ambiente antes de iniciar:
+
+| Variavel | Descricao | Obrigatoria |
+|----------|-----------|-------------|
+| `SPRING_PROFILE` | Perfil ativo (`prod`) | Sim |
+| `DATABASE_URL` | URL JDBC do PostgreSQL | Sim |
+| `DATABASE_USER` | Usuario do banco | Sim |
+| `DATABASE_PASSWORD` | Senha do banco | Sim |
+| `JWT_SECRET` | Chave secreta para tokens JWT (min 32 chars) | Sim |
+| `JOOBLE_API_KEY` | Chave da API Jooble | Sim |
+| `CORS_ALLOWED_ORIGINS` | Origens permitidas (separadas por virgula) | Nao (default: http://localhost:3000) |
+
+```bash
+export SPRING_PROFILE=prod
+export DATABASE_URL=jdbc:postgresql://host:5432/conectatech
+export DATABASE_USER=usuario
+export DATABASE_PASSWORD=senha_segura
+export JWT_SECRET=sua_chave_secreta_com_pelo_menos_32_caracteres
+export JOOBLE_API_KEY=sua_chave_jooble
+./mvnw spring-boot:run
+```
+
 ## Estrutura Git Flow
 
 | Branch | Função |
