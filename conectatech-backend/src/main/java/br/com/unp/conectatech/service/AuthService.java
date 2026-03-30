@@ -48,7 +48,6 @@ public class AuthService {
         usuario.setTokenExpiracao(LocalDateTime.now().plusHours(1));
         usuarioRepository.save(usuario);
 
-        // TODO: Integrar com serviço de email para enviar o token
         return token;
     }
 

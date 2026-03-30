@@ -111,9 +111,6 @@ public class JoobleService {
         }
     }
 
-    /**
-     * DTO interno para o body da requisição Jooble.
-     */
     private record JoobleRequest(String keywords, String location) {
     }
 }

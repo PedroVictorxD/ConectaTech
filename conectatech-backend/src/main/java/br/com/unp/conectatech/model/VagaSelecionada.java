@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * Entidade que registra a seleção de uma vaga por um estudante.
- */
 @Entity
 @Table(name = "vagas_selecionadas", uniqueConstraints = @UniqueConstraint(columnNames = { "usuario_id", "vaga_id" }))
 @Data

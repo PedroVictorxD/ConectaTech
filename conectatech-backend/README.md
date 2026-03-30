@@ -1,76 +1,46 @@
 # ConectaTech API
 
-Backend da plataforma **ConectaTech** — interligando vagas de estágio com estudantes da UNP (Universidade Potiguar), Mossoró/RN.
+Backend da plataforma **ConectaTech** — conectando estudantes de diversos cursos da UNP (Universidade Potiguar) a vagas de estagio na regiao de Mossoro/RN.
 
-## Stack
+## Versao Java
 
-- **Java 17** + **Spring Boot 3.2.5**
-- **PostgreSQL** (banco de dados)
-- **Spring Security** + **JWT** (autenticação)
-- **JSoup** (web scraping)
-- **Jooble API** (vagas externas)
-- **Maven** (build)
-- **Lombok** (produtividade)
-
-## Pré-requisitos
-
-- Java 17+
-- PostgreSQL rodando na porta 5432
-- Banco `conectatech` criado
+- **Java 17** (OpenJDK 17.0.18 ou superior)
 
 ## Como rodar
 
 ```bash
-# Clonar
-git clone <url-do-repo>
+# 1. Clonar o repositorio
+git clone https://github.com/PedroVictorxD/ConectaTech.git
 cd conectatech-backend
 
-# Rodar
+# 2. Criar o banco de dados PostgreSQL
+psql -U postgres -c "CREATE DATABASE conectatech;"
+
+# 3. Rodar a aplicacao
 ./mvnw spring-boot:run
+
+# Windows:
+mvnw.cmd spring-boot:run
 ```
 
-A API estará disponível em `http://localhost:8080`.
+A API estara disponivel em `http://localhost:8080`.
 
-## Configuracao
-
-### Desenvolvimento (padrao)
-
-Basta rodar `./mvnw spring-boot:run`. O profile `dev` eh ativado automaticamente com valores locais.
-
-### Producao
-
-Defina as variaveis de ambiente antes de iniciar:
-
-| Variavel | Descricao | Obrigatoria |
-|----------|-----------|-------------|
-| `SPRING_PROFILE` | Perfil ativo (`prod`) | Sim |
-| `DATABASE_URL` | URL JDBC do PostgreSQL | Sim |
-| `DATABASE_USER` | Usuario do banco | Sim |
-| `DATABASE_PASSWORD` | Senha do banco | Sim |
-| `JWT_SECRET` | Chave secreta para tokens JWT (min 32 chars) | Sim |
-| `JOOBLE_API_KEY` | Chave da API Jooble | Sim |
-| `CORS_ALLOWED_ORIGINS` | Origens permitidas (separadas por virgula) | Nao (default: http://localhost:3000) |
+## Como conectar ao GitHub
 
 ```bash
-export SPRING_PROFILE=prod
-export DATABASE_URL=jdbc:postgresql://host:5432/conectatech
-export DATABASE_USER=usuario
-export DATABASE_PASSWORD=senha_segura
-export JWT_SECRET=sua_chave_secreta_com_pelo_menos_32_caracteres
-export JOOBLE_API_KEY=sua_chave_jooble
-./mvnw spring-boot:run
+# Verificar remote atual
+git remote -v
+
+# Adicionar remote (se ainda nao tiver)
+git remote add origin https://github.com/PedroVictorxD/ConectaTech.git
+
+# Enviar alteracoes
+git push -u origin <nome-da-branch>
+
+# Baixar alteracoes
+git pull origin <nome-da-branch>
 ```
 
-## Estrutura Git Flow
+## Licenca
 
-| Branch | Função |
-|--------|--------|
-| `main` | Versão estável |
-| `develop` | Desenvolvimento contínuo |
-| `feature/*` | Features individuais |
-| `release/*` | Preparação de release |
-| `hotfix/*` | Correções urgentes |
-
-## Licença
-
-Projeto acadêmico — UNP Extensão 2026.
+Projeto academico — UNP Extensao 2026.
