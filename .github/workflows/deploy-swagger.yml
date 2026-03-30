@@ -41,9 +41,11 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: maven
+          cache-dependency-path: conectatech-backend/pom.xml
 
       - name: Build project
         run: ./mvnw compile -q
+        working-directory: conectatech-backend
 
       - name: Start app and export OpenAPI spec
         run: |
@@ -59,6 +61,7 @@ jobs:
           done
           curl -s http://localhost:8080/v3/api-docs > docs/swagger/openapi.json
           kill $APP_PID || true
+        working-directory: conectatech-backend
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/conectatech
           SPRING_DATASOURCE_USERNAME: postgres
@@ -70,7 +73,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/swagger
+          path: conectatech-backend/docs/swagger
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
