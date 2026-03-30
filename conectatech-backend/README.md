@@ -15,19 +15,33 @@ Backend da plataforma **ConectaTech** — conectando estudantes de diversos curs
 
 ## Pre-requisitos
 
-- Java 17+
-- PostgreSQL rodando na porta 5432
-- Banco `conectatech` criado
+- **Java 17** (OpenJDK 17.0.18 ou superior)
+- **PostgreSQL 14+** rodando na porta 5432
+- Banco de dados `conectatech` criado
 
 ## Como rodar
 
 ```bash
+# 1. Clonar o repositorio
 git clone https://github.com/PedroVictorxD/ConectaTech.git
 cd conectatech-backend
+
+# 2. Criar o banco de dados (se ainda nao existir)
+psql -U postgres -c "CREATE DATABASE conectatech;"
+
+# 3. Verificar versao do Java
+java -version   # deve ser 17+
+
+# 4. Rodar a aplicacao (Maven Wrapper incluso, nao precisa instalar Maven)
 ./mvnw spring-boot:run
+
+# Ou no Windows:
+mvnw.cmd spring-boot:run
 ```
 
 A API estara disponivel em `http://localhost:8080`.
+
+O profile `dev` e ativado automaticamente. As tabelas sao criadas/atualizadas pelo Hibernate (`ddl-auto=update`).
 
 ## Documentacao da API (Swagger)
 
