@@ -1,0 +1,76 @@
+name: Deploy Swagger UI
+
+on:
+  push:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: conectatech
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Build project
+        run: ./mvnw compile -q
+
+      - name: Start app and export OpenAPI spec
+        run: |
+          ./mvnw spring-boot:run -q &
+          APP_PID=$!
+          echo "Waiting for app to start..."
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:8080/v3/api-docs > /dev/null 2>&1; then
+              echo "App started!"
+              break
+            fi
+            sleep 2
+          done
+          curl -s http://localhost:8080/v3/api-docs > docs/swagger/openapi.json
+          kill $APP_PID || true
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/conectatech
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/swagger
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
