@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ public class AdminController {
         this.joobleService = joobleService;
     }
 
-    @GetMapping("/usuarios")
+    @GetMapping("/users")
     @Operation(summary = "Listar usuarios", description = "Retorna todos os usuarios cadastrados")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista de usuarios"),
@@ -44,7 +45,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.listarUsuarios());
     }
 
-    @GetMapping("/usuarios/{id}")
+    @GetMapping("/users/{id}")
     @Operation(summary = "Buscar usuario por ID", description = "Retorna os dados de um usuario especifico")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
@@ -55,7 +56,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.buscarUsuarioPorId(id));
     }
 
-    @PutMapping("/usuarios/{id}")
+    @PutMapping("/users/{id}")
     @Operation(summary = "Atualizar usuario", description = "Atualiza os dados de um usuario")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Usuario atualizado"),
@@ -63,11 +64,11 @@ public class AdminController {
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
     public ResponseEntity<UsuarioDTO> atualizarUsuario(@Parameter(description = "ID do usuario") @PathVariable Long id,
-            @RequestBody UsuarioDTO dto) {
+            @Valid @RequestBody UsuarioDTO dto) {
         return ResponseEntity.ok(adminService.atualizarUsuario(id, dto));
     }
 
-    @PostMapping("/importar-scraper")
+    @PostMapping("/import-scraper")
     @Operation(summary = "Executar scraping", description = "Executa o scraper manualmente para importar vagas de sites externos")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Scraping executado com quantidade de vagas importadas"),
@@ -80,7 +81,7 @@ public class AdminController {
                 "vagasImportadas", vagas.size()));
     }
 
-    @PostMapping("/importar-jooble")
+    @PostMapping("/import-jooble")
     @Operation(summary = "Importar vagas do Jooble", description = "Busca e importa vagas da API Jooble para o banco de dados")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Importacao concluida com quantidade de vagas"),
@@ -95,7 +96,7 @@ public class AdminController {
                 "vagasImportadas", vagas.size()));
     }
 
-    @GetMapping("/vagas")
+    @GetMapping("/jobs")
     @Operation(summary = "Listar todas as vagas (admin)", description = "Retorna todas as vagas cadastradas no sistema")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista de vagas"),
@@ -105,17 +106,17 @@ public class AdminController {
         return ResponseEntity.ok(adminService.listarVagas());
     }
 
-    @PostMapping("/vagas")
+    @PostMapping("/jobs")
     @Operation(summary = "Criar vaga manualmente", description = "Cadastra uma nova vaga com fonte ADMIN")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Vaga criada"),
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
-    public ResponseEntity<VagaDTO> criarVaga(@RequestBody VagaDTO dto) {
+    public ResponseEntity<VagaDTO> criarVaga(@Valid @RequestBody VagaDTO dto) {
         return ResponseEntity.ok(adminService.criarVaga(dto));
     }
 
-    @PutMapping("/vagas/{id}")
+    @PutMapping("/jobs/{id}")
     @Operation(summary = "Atualizar vaga", description = "Atualiza os dados de uma vaga existente")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Vaga atualizada"),
@@ -123,11 +124,11 @@ public class AdminController {
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
     public ResponseEntity<VagaDTO> atualizarVaga(@Parameter(description = "ID da vaga") @PathVariable Long id,
-            @RequestBody VagaDTO dto) {
+            @Valid @RequestBody VagaDTO dto) {
         return ResponseEntity.ok(adminService.atualizarVaga(id, dto));
     }
 
-    @DeleteMapping("/vagas/{id}")
+    @DeleteMapping("/jobs/{id}")
     @Operation(summary = "Deletar vaga", description = "Remove permanentemente uma vaga do sistema")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Vaga removida"),
