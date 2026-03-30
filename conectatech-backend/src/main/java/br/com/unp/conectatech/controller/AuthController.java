@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -59,9 +58,9 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Token de recuperacao gerado"),
             @ApiResponse(responseCode = "404", description = "Email nao encontrado", content = @Content)
     })
-    public ResponseEntity<Map<String, String>> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequest request) {
+    public ResponseEntity<MessageResponse> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequest request) {
         authService.recuperarSenha(request);
-        return ResponseEntity.ok(Map.of("message", "Token de recuperacao gerado com sucesso"));
+        return ResponseEntity.ok(new MessageResponse("Token de recuperacao gerado com sucesso"));
     }
 
     @PutMapping("/reset-password")
@@ -70,8 +69,8 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso"),
             @ApiResponse(responseCode = "400", description = "Token invalido ou expirado", content = @Content)
     })
-    public ResponseEntity<Map<String, String>> alterarSenha(@Valid @RequestBody AlterarSenhaRequest request) {
+    public ResponseEntity<MessageResponse> alterarSenha(@Valid @RequestBody AlterarSenhaRequest request) {
         authService.alterarSenha(request);
-        return ResponseEntity.ok(Map.of("message", "Senha alterada com sucesso"));
+        return ResponseEntity.ok(new MessageResponse("Senha alterada com sucesso"));
     }
 }

@@ -16,8 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import br.com.unp.conectatech.dto.MessageResponse;
+
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -83,12 +84,12 @@ public class VagaController {
             @ApiResponse(responseCode = "401", description = "Token JWT ausente ou invalido"),
             @ApiResponse(responseCode = "404", description = "Vaga nao encontrada")
     })
-    public ResponseEntity<Map<String, String>> selecionar(@Valid @RequestBody SelecionarVagaRequest request,
+    public ResponseEntity<MessageResponse> selecionar(@Valid @RequestBody SelecionarVagaRequest request,
             Authentication authentication) {
         String email = authentication.getName();
         Long vagaId = request.getVagaId();
         vagaSelecionadaService.selecionar(email, vagaId);
-        return ResponseEntity.ok(Map.of("message", "Vaga selecionada com sucesso"));
+        return ResponseEntity.ok(new MessageResponse("Vaga selecionada com sucesso"));
     }
 
     @GetMapping("/my-selections")
@@ -108,10 +109,10 @@ public class VagaController {
             @ApiResponse(responseCode = "200", description = "Vaga removida das selecionadas"),
             @ApiResponse(responseCode = "401", description = "Token JWT ausente ou invalido")
     })
-    public ResponseEntity<Map<String, String>> removerSelecionada(@Parameter(description = "ID da vaga") @PathVariable Long vagaId,
+    public ResponseEntity<MessageResponse> removerSelecionada(@Parameter(description = "ID da vaga") @PathVariable Long vagaId,
             Authentication authentication) {
         String email = authentication.getName();
         vagaSelecionadaService.removerSelecionada(email, vagaId);
-        return ResponseEntity.ok(Map.of("message", "Vaga removida das selecionadas"));
+        return ResponseEntity.ok(new MessageResponse("Vaga removida das selecionadas"));
     }
 }

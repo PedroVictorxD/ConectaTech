@@ -1,5 +1,7 @@
 package br.com.unp.conectatech.controller;
 
+import br.com.unp.conectatech.dto.ImportResponse;
+import br.com.unp.conectatech.dto.MessageResponse;
 import br.com.unp.conectatech.dto.UsuarioDTO;
 import br.com.unp.conectatech.dto.VagaDTO;
 import br.com.unp.conectatech.model.Vaga;
@@ -17,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -74,11 +75,9 @@ public class AdminController {
             @ApiResponse(responseCode = "200", description = "Scraping executado com quantidade de vagas importadas"),
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
-    public ResponseEntity<Map<String, Object>> importarScraper() {
+    public ResponseEntity<ImportResponse> importarScraper() {
         List<Vaga> vagas = scraperService.executarScraping();
-        return ResponseEntity.ok(Map.of(
-                "message", "Scraping executado",
-                "vagasImportadas", vagas.size()));
+        return ResponseEntity.ok(new ImportResponse("Scraping executado", vagas.size()));
     }
 
     @PostMapping("/import-jooble")
@@ -87,13 +86,11 @@ public class AdminController {
             @ApiResponse(responseCode = "200", description = "Importacao concluida com quantidade de vagas"),
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
-    public ResponseEntity<Map<String, Object>> importarJooble(
+    public ResponseEntity<ImportResponse> importarJooble(
             @Parameter(description = "Palavras-chave para busca") @RequestParam(defaultValue = "estagio tecnologia") String keywords,
             @Parameter(description = "Localizacao da busca") @RequestParam(defaultValue = "Mossoro, RN") String location) {
         List<Vaga> vagas = joobleService.buscarVagasJooble(keywords, location);
-        return ResponseEntity.ok(Map.of(
-                "message", "Importacao Jooble concluida",
-                "vagasImportadas", vagas.size()));
+        return ResponseEntity.ok(new ImportResponse("Importacao Jooble concluida", vagas.size()));
     }
 
     @GetMapping("/jobs")
@@ -135,8 +132,8 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Vaga nao encontrada"),
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
-    public ResponseEntity<Map<String, String>> deletarVaga(@Parameter(description = "ID da vaga") @PathVariable Long id) {
+    public ResponseEntity<MessageResponse> deletarVaga(@Parameter(description = "ID da vaga") @PathVariable Long id) {
         adminService.deletarVaga(id);
-        return ResponseEntity.ok(Map.of("message", "Vaga removida com sucesso"));
+        return ResponseEntity.ok(new MessageResponse("Vaga removida com sucesso"));
     }
 }
