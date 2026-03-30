@@ -1,6 +1,7 @@
 package br.com.unp.conectatech.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +17,11 @@ public class VagaDTO {
     @Schema(description = "ID da vaga", example = "1")
     private Long id;
 
+    @NotBlank(message = "Titulo é obrigatório")
     @Schema(description = "Titulo da vaga", example = "Estagiario de Desenvolvimento Web")
     private String titulo;
 
+    @NotBlank(message = "Empresa é obrigatória")
     @Schema(description = "Nome da empresa", example = "Tech Solutions LTDA")
     private String empresa;
 

@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/meus-dados")
+@RequestMapping("/api/profile")
 @Tag(name = "Usuario", description = "Perfil do estudante autenticado")
 @SecurityRequirement(name = "bearerAuth")
 public class UsuarioController {
