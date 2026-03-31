@@ -968,12 +968,12 @@
           "nome": {
             "type": "string",
             "description": "Nome completo",
-            "example": "Joao Silva"
+            "example": "Pedro Victor"
           },
           "email": {
             "type": "string",
             "description": "Email do estudante",
-            "example": "joao.silva@email.com"
+            "example": "pedro@email.com"
           },
           "senha": {
             "type": "string",
@@ -1025,7 +1025,7 @@
           "nome": {
             "type": "string",
             "description": "Nome do usuario",
-            "example": "Joao Silva"
+            "example": "Pedro Victor"
           },
           "email": {
             "type": "string",
@@ -1084,7 +1084,7 @@
           "nome": {
             "type": "string",
             "description": "Nome completo",
-            "example": "Joao Silva"
+            "example": "Pedro Victor"
           },
           "curso": {
             "type": "string",
@@ -1114,12 +1114,12 @@
           "nome": {
             "type": "string",
             "description": "Nome completo",
-            "example": "Joao Silva"
+            "example": "Pedro Victor"
           },
           "email": {
             "type": "string",
             "description": "Email",
-            "example": "joao.silva@email.com"
+            "example": "pedro@email.com"
           },
           "curso": {
             "type": "string",

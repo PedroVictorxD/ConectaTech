@@ -18,10 +18,10 @@ public class UsuarioDTO {
     private Long id;
 
     @NotBlank(message = "Nome é obrigatório")
-    @Schema(description = "Nome completo", example = "Joao Silva")
+    @Schema(description = "Nome completo", example = "Pedro Victor")
     private String nome;
 
-    @Schema(description = "Email", example = "joao.silva@email.com")
+    @Schema(description = "Email", example = "pedro@email.com")
     private String email;
 
     @Schema(description = "Curso", example = "Ciencia da Computacao")

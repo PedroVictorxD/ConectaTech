@@ -9,7 +9,7 @@ import lombok.Data;
 public class AtualizarUsuarioRequest {
 
     @NotBlank(message = "Nome é obrigatório")
-    @Schema(description = "Nome completo", example = "Joao Silva")
+    @Schema(description = "Nome completo", example = "Pedro Victor")
     private String nome;
 
     @Schema(description = "Curso do estudante", example = "Engenharia de Software")

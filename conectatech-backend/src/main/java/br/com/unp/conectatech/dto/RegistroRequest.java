@@ -11,12 +11,12 @@ import lombok.Data;
 public class RegistroRequest {
 
     @NotBlank(message = "Nome é obrigatório")
-    @Schema(description = "Nome completo", example = "Joao Silva")
+    @Schema(description = "Nome completo", example = "Pedro Victor")
     private String nome;
 
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email inválido")
-    @Schema(description = "Email do estudante", example = "joao.silva@email.com")
+    @Schema(description = "Email do estudante", example = "pedro@email.com")
     private String email;
 
     @NotBlank(message = "Senha é obrigatória")

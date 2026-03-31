@@ -12,7 +12,7 @@ public class LoginResponse {
     @Schema(description = "Token JWT para autenticacao", example = "eyJhbGciOiJIUzI1NiJ9...")
     private String token;
 
-    @Schema(description = "Nome do usuario", example = "Joao Silva")
+    @Schema(description = "Nome do usuario", example = "Pedro Victor")
     private String nome;
 
     @Schema(description = "Email do usuario", example = "aluno@email.com")
