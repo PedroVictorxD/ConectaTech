@@ -12,22 +12,38 @@
     }
   ],
   "tags": [
-    { "name": "Auth", "description": "Autenticacao e registro de usuarios" },
-    { "name": "Usuario", "description": "Perfil do estudante autenticado" },
-    { "name": "Vagas", "description": "Busca e selecao de vagas de estagio" },
-    { "name": "Admin", "description": "Gerenciamento de usuarios e vagas (requer role ADMIN)" }
+    {
+      "name": "Auth",
+      "description": "Autenticacao e registro de usuarios"
+    },
+    {
+      "name": "Usuario",
+      "description": "Perfil do estudante autenticado"
+    },
+    {
+      "name": "Vagas",
+      "description": "Busca e selecao de vagas de estagio"
+    },
+    {
+      "name": "Admin",
+      "description": "Gerenciamento de usuarios e vagas (requer role ADMIN)"
+    }
   ],
   "paths": {
     "/api/auth/register": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Registrar novo estudante",
         "description": "Cria uma nova conta de estudante na plataforma",
         "operationId": "register",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/RegistroRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/RegistroRequest"
+              }
             }
           },
           "required": true
@@ -37,26 +53,33 @@
             "description": "Usuario registrado com sucesso",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UsuarioDTO" }
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioDTO"
+                }
               }
             }
           },
           "400": {
-            "description": "Dados invalidos ou email ja cadastrado"
+            "description": "Dados invalidos ou email ja cadastrado",
+            "content": {}
           }
         }
       }
     },
     "/api/auth/login": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Login",
         "description": "Autentica o usuario e retorna um token JWT",
         "operationId": "login",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
             }
           },
           "required": true
@@ -66,26 +89,33 @@
             "description": "Login realizado com sucesso",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
               }
             }
           },
           "400": {
-            "description": "Email ou senha invalidos"
+            "description": "Email ou senha invalidos",
+            "content": {}
           }
         }
       }
     },
     "/api/auth/forgot-password": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Solicitar recuperacao de senha",
         "description": "Gera um token de recuperacao para o email informado",
         "operationId": "forgotPassword",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/RecuperarSenhaRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/RecuperarSenhaRequest"
+              }
             }
           },
           "required": true
@@ -98,28 +128,36 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": { "type": "string", "example": "Token de recuperacao gerado com sucesso" }
+                    "message": {
+                      "type": "string",
+                      "example": "Token de recuperacao gerado com sucesso"
+                    }
                   }
                 }
               }
             }
           },
           "404": {
-            "description": "Email nao encontrado"
+            "description": "Email nao encontrado",
+            "content": {}
           }
         }
       }
     },
     "/api/auth/reset-password": {
       "put": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Alterar senha",
         "description": "Altera a senha usando o token de recuperacao",
         "operationId": "resetPassword",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/AlterarSenhaRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/AlterarSenhaRequest"
+              }
             }
           },
           "required": true
@@ -132,21 +170,27 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": { "type": "string", "example": "Senha alterada com sucesso" }
+                    "message": {
+                      "type": "string",
+                      "example": "Senha alterada com sucesso"
+                    }
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Token invalido ou expirado"
+            "description": "Token invalido ou expirado",
+            "content": {}
           }
         }
       }
     },
     "/api/profile": {
       "get": {
-        "tags": ["Usuario"],
+        "tags": [
+          "Usuario"
+        ],
         "summary": "Ver meus dados",
         "description": "Retorna os dados do estudante autenticado",
         "operationId": "getProfile",
@@ -155,25 +199,36 @@
             "description": "Dados do usuario",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UsuarioDTO" }
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioDTO"
+                }
               }
             }
           },
           "401": {
-            "description": "Token JWT ausente ou invalido"
+            "description": "Token JWT ausente ou invalido",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "put": {
-        "tags": ["Usuario"],
+        "tags": [
+          "Usuario"
+        ],
         "summary": "Atualizar meus dados",
         "description": "Atualiza nome, curso e periodo do estudante autenticado",
         "operationId": "updateProfile",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/AtualizarUsuarioRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarUsuarioRequest"
+              }
             }
           },
           "required": true
@@ -183,23 +238,33 @@
             "description": "Dados atualizados",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UsuarioDTO" }
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioDTO"
+                }
               }
             }
           },
           "400": {
-            "description": "Dados invalidos"
+            "description": "Dados invalidos",
+            "content": {}
           },
           "401": {
-            "description": "Token JWT ausente ou invalido"
+            "description": "Token JWT ausente ou invalido",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/jobs": {
       "get": {
-        "tags": ["Vagas"],
+        "tags": [
+          "Vagas"
+        ],
         "summary": "Listar vagas",
         "description": "Lista todas as vagas com filtros opcionais por texto, localizacao e fonte",
         "operationId": "listJobs",
@@ -209,21 +274,27 @@
             "in": "query",
             "description": "Texto para buscar em titulo, empresa e descricao",
             "required": false,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "localizacao",
             "in": "query",
             "description": "Filtrar por localizacao (ex: Mossoro)",
             "required": false,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "fonte",
             "in": "query",
             "description": "Filtrar por fonte: JOOBLE, JSOUP ou ADMIN",
             "required": false,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -233,7 +304,9 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/VagaDTO" }
+                  "items": {
+                    "$ref": "#/components/schemas/VagaDTO"
+                  }
                 }
               }
             }
@@ -243,7 +316,9 @@
     },
     "/api/jobs/{id}": {
       "get": {
-        "tags": ["Vagas"],
+        "tags": [
+          "Vagas"
+        ],
         "summary": "Buscar vaga por ID",
         "description": "Retorna os detalhes de uma vaga especifica",
         "operationId": "getJobById",
@@ -253,7 +328,10 @@
             "in": "path",
             "description": "ID da vaga",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
@@ -261,19 +339,24 @@
             "description": "Vaga encontrada",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/VagaDTO" }
+                "schema": {
+                  "$ref": "#/components/schemas/VagaDTO"
+                }
               }
             }
           },
           "404": {
-            "description": "Vaga nao encontrada"
+            "description": "Vaga nao encontrada",
+            "content": {}
           }
         }
       }
     },
     "/api/jobs/search-external": {
       "get": {
-        "tags": ["Vagas"],
+        "tags": [
+          "Vagas"
+        ],
         "summary": "Buscar vagas externas",
         "description": "Importa vagas do Jooble e retorna resultados do banco",
         "operationId": "searchExternal",
@@ -283,14 +366,20 @@
             "in": "query",
             "description": "Palavras-chave para busca",
             "required": false,
-            "schema": { "type": "string", "default": "estagio" }
+            "schema": {
+              "type": "string",
+              "default": "estagio"
+            }
           },
           {
             "name": "location",
             "in": "query",
             "description": "Localizacao da busca",
             "required": false,
-            "schema": { "type": "string", "default": "Mossoro, RN" }
+            "schema": {
+              "type": "string",
+              "default": "Mossoro, RN"
+            }
           }
         ],
         "responses": {
@@ -300,7 +389,9 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/VagaDTO" }
+                  "items": {
+                    "$ref": "#/components/schemas/VagaDTO"
+                  }
                 }
               }
             }
@@ -310,14 +401,18 @@
     },
     "/api/jobs/select": {
       "post": {
-        "tags": ["Vagas"],
+        "tags": [
+          "Vagas"
+        ],
         "summary": "Selecionar vaga",
         "description": "Adiciona uma vaga a lista de vagas selecionadas do estudante",
         "operationId": "selectJob",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/SelecionarVagaRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/SelecionarVagaRequest"
+              }
             }
           },
           "required": true
@@ -330,25 +425,36 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": { "type": "string", "example": "Vaga selecionada com sucesso" }
+                    "message": {
+                      "type": "string",
+                      "example": "Vaga selecionada com sucesso"
+                    }
                   }
                 }
               }
             }
           },
           "401": {
-            "description": "Token JWT ausente ou invalido"
+            "description": "Token JWT ausente ou invalido",
+            "content": {}
           },
           "404": {
-            "description": "Vaga nao encontrada"
+            "description": "Vaga nao encontrada",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/jobs/my-selections": {
       "get": {
-        "tags": ["Vagas"],
+        "tags": [
+          "Vagas"
+        ],
         "summary": "Minhas vagas",
         "description": "Lista as vagas selecionadas pelo estudante autenticado",
         "operationId": "mySelections",
@@ -359,21 +465,30 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/VagaDTO" }
+                  "items": {
+                    "$ref": "#/components/schemas/VagaDTO"
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Token JWT ausente ou invalido"
+            "description": "Token JWT ausente ou invalido",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/jobs/my-selections/{vagaId}": {
       "delete": {
-        "tags": ["Vagas"],
+        "tags": [
+          "Vagas"
+        ],
         "summary": "Remover vaga selecionada",
         "description": "Remove uma vaga da lista de selecionadas do estudante",
         "operationId": "removeSelection",
@@ -383,7 +498,10 @@
             "in": "path",
             "description": "ID da vaga",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
@@ -394,22 +512,32 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": { "type": "string", "example": "Vaga removida das selecionadas" }
+                    "message": {
+                      "type": "string",
+                      "example": "Vaga removida das selecionadas"
+                    }
                   }
                 }
               }
             }
           },
           "401": {
-            "description": "Token JWT ausente ou invalido"
+            "description": "Token JWT ausente ou invalido",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/admin/users": {
       "get": {
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "summary": "Listar usuarios",
         "description": "Retorna todos os usuarios cadastrados",
         "operationId": "listUsers",
@@ -420,21 +548,30 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/UsuarioDTO" }
+                  "items": {
+                    "$ref": "#/components/schemas/UsuarioDTO"
+                  }
                 }
               }
             }
           },
           "403": {
-            "description": "Acesso negado - requer role ADMIN"
+            "description": "Acesso negado - requer role ADMIN",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/admin/users/{id}": {
       "get": {
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "summary": "Buscar usuario por ID",
         "description": "Retorna os dados de um usuario especifico",
         "operationId": "getUserById",
@@ -444,7 +581,10 @@
             "in": "path",
             "description": "ID do usuario",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
@@ -452,21 +592,31 @@
             "description": "Usuario encontrado",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UsuarioDTO" }
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioDTO"
+                }
               }
             }
           },
           "404": {
-            "description": "Usuario nao encontrado"
+            "description": "Usuario nao encontrado",
+            "content": {}
           },
           "403": {
-            "description": "Acesso negado"
+            "description": "Acesso negado",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "put": {
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "summary": "Atualizar usuario",
         "description": "Atualiza os dados de um usuario",
         "operationId": "updateUser",
@@ -476,13 +626,18 @@
             "in": "path",
             "description": "ID do usuario",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/UsuarioDTO" }
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioDTO"
+              }
             }
           },
           "required": true
@@ -492,23 +647,33 @@
             "description": "Usuario atualizado",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UsuarioDTO" }
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioDTO"
+                }
               }
             }
           },
           "404": {
-            "description": "Usuario nao encontrado"
+            "description": "Usuario nao encontrado",
+            "content": {}
           },
           "403": {
-            "description": "Acesso negado"
+            "description": "Acesso negado",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/admin/jobs": {
       "get": {
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "summary": "Listar todas as vagas (admin)",
         "description": "Retorna todas as vagas cadastradas no sistema",
         "operationId": "listAllJobs",
@@ -519,26 +684,37 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/VagaDTO" }
+                  "items": {
+                    "$ref": "#/components/schemas/VagaDTO"
+                  }
                 }
               }
             }
           },
           "403": {
-            "description": "Acesso negado"
+            "description": "Acesso negado",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "post": {
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "summary": "Criar vaga manualmente",
         "description": "Cadastra uma nova vaga com fonte ADMIN",
         "operationId": "createJob",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/VagaDTO" }
+              "schema": {
+                "$ref": "#/components/schemas/VagaDTO"
+              }
             }
           },
           "required": true
@@ -548,20 +724,29 @@
             "description": "Vaga criada",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/VagaDTO" }
+                "schema": {
+                  "$ref": "#/components/schemas/VagaDTO"
+                }
               }
             }
           },
           "403": {
-            "description": "Acesso negado"
+            "description": "Acesso negado",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/admin/jobs/{id}": {
       "put": {
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "summary": "Atualizar vaga",
         "description": "Atualiza os dados de uma vaga existente",
         "operationId": "updateJob",
@@ -571,13 +756,18 @@
             "in": "path",
             "description": "ID da vaga",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/VagaDTO" }
+              "schema": {
+                "$ref": "#/components/schemas/VagaDTO"
+              }
             }
           },
           "required": true
@@ -587,21 +777,31 @@
             "description": "Vaga atualizada",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/VagaDTO" }
+                "schema": {
+                  "$ref": "#/components/schemas/VagaDTO"
+                }
               }
             }
           },
           "404": {
-            "description": "Vaga nao encontrada"
+            "description": "Vaga nao encontrada",
+            "content": {}
           },
           "403": {
-            "description": "Acesso negado"
+            "description": "Acesso negado",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "delete": {
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "summary": "Deletar vaga",
         "description": "Remove permanentemente uma vaga do sistema",
         "operationId": "deleteJob",
@@ -611,7 +811,10 @@
             "in": "path",
             "description": "ID da vaga",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
@@ -622,25 +825,36 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": { "type": "string", "example": "Vaga removida com sucesso" }
+                    "message": {
+                      "type": "string",
+                      "example": "Vaga removida com sucesso"
+                    }
                   }
                 }
               }
             }
           },
           "404": {
-            "description": "Vaga nao encontrada"
+            "description": "Vaga nao encontrada",
+            "content": {}
           },
           "403": {
-            "description": "Acesso negado"
+            "description": "Acesso negado",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/admin/import-scraper": {
       "post": {
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "summary": "Executar scraping",
         "description": "Executa o scraper manualmente para importar vagas de sites externos",
         "operationId": "importScraper",
@@ -652,23 +866,36 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": { "type": "string", "example": "Scraping executado" },
-                    "vagasImportadas": { "type": "integer", "example": 15 }
+                    "message": {
+                      "type": "string",
+                      "example": "Scraping executado"
+                    },
+                    "vagasImportadas": {
+                      "type": "integer",
+                      "example": 15
+                    }
                   }
                 }
               }
             }
           },
           "403": {
-            "description": "Acesso negado"
+            "description": "Acesso negado",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/admin/import-jooble": {
       "post": {
-        "tags": ["Admin"],
+        "tags": [
+          "Admin"
+        ],
         "summary": "Importar vagas do Jooble",
         "description": "Busca e importa vagas da API Jooble para o banco de dados",
         "operationId": "importJooble",
@@ -678,14 +905,20 @@
             "in": "query",
             "description": "Palavras-chave para busca",
             "required": false,
-            "schema": { "type": "string", "default": "estagio tecnologia" }
+            "schema": {
+              "type": "string",
+              "default": "estagio tecnologia"
+            }
           },
           {
             "name": "location",
             "in": "query",
             "description": "Localizacao da busca",
             "required": false,
-            "schema": { "type": "string", "default": "Mossoro, RN" }
+            "schema": {
+              "type": "string",
+              "default": "Mossoro, RN"
+            }
           }
         ],
         "responses": {
@@ -696,115 +929,284 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": { "type": "string", "example": "Importacao Jooble concluida" },
-                    "vagasImportadas": { "type": "integer", "example": 10 }
+                    "message": {
+                      "type": "string",
+                      "example": "Importacao Jooble concluida"
+                    },
+                    "vagasImportadas": {
+                      "type": "integer",
+                      "example": 10
+                    }
                   }
                 }
               }
             }
           },
           "403": {
-            "description": "Acesso negado"
+            "description": "Acesso negado",
+            "content": {}
           }
         },
-        "security": [{ "bearerAuth": [] }]
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   },
   "components": {
     "schemas": {
       "RegistroRequest": {
-        "required": ["nome", "email", "senha"],
+        "required": [
+          "nome",
+          "email",
+          "senha"
+        ],
         "type": "object",
         "properties": {
-          "nome": { "type": "string", "description": "Nome completo", "example": "Joao Silva" },
-          "email": { "type": "string", "description": "Email do estudante", "example": "joao.silva@email.com" },
-          "senha": { "type": "string", "description": "Senha (min 6 caracteres)", "minLength": 6, "example": "minhasenha123" },
-          "curso": { "type": "string", "description": "Curso do estudante", "example": "Ciencia da Computacao" },
-          "periodo": { "type": "string", "description": "Periodo atual", "example": "6" }
+          "nome": {
+            "type": "string",
+            "description": "Nome completo",
+            "example": "Joao Silva"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email do estudante",
+            "example": "joao.silva@email.com"
+          },
+          "senha": {
+            "type": "string",
+            "description": "Senha (min 6 caracteres)",
+            "minLength": 6,
+            "example": "minhasenha123"
+          },
+          "curso": {
+            "type": "string",
+            "description": "Curso do estudante",
+            "example": "Ciencia da Computacao"
+          },
+          "periodo": {
+            "type": "string",
+            "description": "Periodo atual",
+            "example": "6"
+          }
         },
         "description": "Dados para registro de novo estudante"
       },
       "LoginRequest": {
-        "required": ["email", "senha"],
+        "required": [
+          "email",
+          "senha"
+        ],
         "type": "object",
         "properties": {
-          "email": { "type": "string", "description": "Email do usuario", "example": "aluno@email.com" },
-          "senha": { "type": "string", "description": "Senha do usuario", "example": "minhasenha123" }
+          "email": {
+            "type": "string",
+            "description": "Email do usuario",
+            "example": "aluno@email.com"
+          },
+          "senha": {
+            "type": "string",
+            "description": "Senha do usuario",
+            "example": "minhasenha123"
+          }
         },
         "description": "Dados para login"
       },
       "LoginResponse": {
         "type": "object",
         "properties": {
-          "token": { "type": "string", "description": "Token JWT para autenticacao", "example": "eyJhbGciOiJIUzI1NiJ9..." },
-          "nome": { "type": "string", "description": "Nome do usuario", "example": "Joao Silva" },
-          "email": { "type": "string", "description": "Email do usuario", "example": "aluno@email.com" },
-          "role": { "type": "string", "description": "Role do usuario", "example": "STUDENT" }
+          "token": {
+            "type": "string",
+            "description": "Token JWT para autenticacao",
+            "example": "eyJhbGciOiJIUzI1NiJ9..."
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome do usuario",
+            "example": "Joao Silva"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email do usuario",
+            "example": "aluno@email.com"
+          },
+          "role": {
+            "type": "string",
+            "description": "Role do usuario",
+            "example": "STUDENT"
+          }
         },
         "description": "Resposta de login com token JWT"
       },
       "RecuperarSenhaRequest": {
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "type": "object",
         "properties": {
-          "email": { "type": "string", "description": "Email cadastrado", "example": "aluno@email.com" }
+          "email": {
+            "type": "string",
+            "description": "Email cadastrado",
+            "example": "aluno@email.com"
+          }
         },
         "description": "Dados para solicitar recuperacao de senha"
       },
       "AlterarSenhaRequest": {
-        "required": ["token", "novaSenha"],
+        "required": [
+          "token",
+          "novaSenha"
+        ],
         "type": "object",
         "properties": {
-          "token": { "type": "string", "description": "Token recebido na recuperacao de senha", "example": "550e8400-e29b-41d4-a716-446655440000" },
-          "novaSenha": { "type": "string", "description": "Nova senha (min 6 caracteres)", "minLength": 6, "example": "novasenha456" }
+          "token": {
+            "type": "string",
+            "description": "Token recebido na recuperacao de senha",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "novaSenha": {
+            "type": "string",
+            "description": "Nova senha (min 6 caracteres)",
+            "minLength": 6,
+            "example": "novasenha456"
+          }
         },
         "description": "Dados para alterar senha com token de recuperacao"
       },
       "AtualizarUsuarioRequest": {
-        "required": ["nome"],
+        "required": [
+          "nome"
+        ],
         "type": "object",
         "properties": {
-          "nome": { "type": "string", "description": "Nome completo", "example": "Joao Silva" },
-          "curso": { "type": "string", "description": "Curso do estudante", "example": "Engenharia de Software" },
-          "periodo": { "type": "string", "description": "Periodo atual", "example": "7" }
+          "nome": {
+            "type": "string",
+            "description": "Nome completo",
+            "example": "Joao Silva"
+          },
+          "curso": {
+            "type": "string",
+            "description": "Curso do estudante",
+            "example": "Engenharia de Software"
+          },
+          "periodo": {
+            "type": "string",
+            "description": "Periodo atual",
+            "example": "7"
+          }
         },
         "description": "Dados para atualizar perfil do estudante"
       },
       "UsuarioDTO": {
-        "required": ["nome"],
+        "required": [
+          "nome"
+        ],
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "format": "int64", "description": "ID do usuario", "example": 1 },
-          "nome": { "type": "string", "description": "Nome completo", "example": "Joao Silva" },
-          "email": { "type": "string", "description": "Email", "example": "joao.silva@email.com" },
-          "curso": { "type": "string", "description": "Curso", "example": "Ciencia da Computacao" },
-          "periodo": { "type": "string", "description": "Periodo", "example": "6" },
-          "role": { "type": "string", "description": "Role do usuario", "example": "STUDENT" },
-          "criadoEm": { "type": "string", "description": "Data de criacao", "example": "30/03/2026 14:30" }
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID do usuario",
+            "example": 1
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome completo",
+            "example": "Joao Silva"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email",
+            "example": "joao.silva@email.com"
+          },
+          "curso": {
+            "type": "string",
+            "description": "Curso",
+            "example": "Ciencia da Computacao"
+          },
+          "periodo": {
+            "type": "string",
+            "description": "Periodo",
+            "example": "6"
+          },
+          "role": {
+            "type": "string",
+            "description": "Role do usuario",
+            "example": "STUDENT"
+          },
+          "criadoEm": {
+            "type": "string",
+            "description": "Data de criacao",
+            "example": "30/03/2026 14:30"
+          }
         },
         "description": "Dados do usuario"
       },
       "VagaDTO": {
-        "required": ["titulo", "empresa"],
+        "required": [
+          "titulo",
+          "empresa"
+        ],
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "format": "int64", "description": "ID da vaga", "example": 1 },
-          "titulo": { "type": "string", "description": "Titulo da vaga", "example": "Estagiario de Desenvolvimento Web" },
-          "empresa": { "type": "string", "description": "Nome da empresa", "example": "Tech Solutions LTDA" },
-          "descricao": { "type": "string", "description": "Descricao da vaga", "example": "Vaga para desenvolvimento web com React e Spring Boot" },
-          "localizacao": { "type": "string", "description": "Localizacao da vaga", "example": "Mossoro, RN" },
-          "url": { "type": "string", "description": "URL da vaga original", "example": "https://exemplo.com/vaga/123" },
-          "fonte": { "type": "string", "description": "Fonte da vaga", "example": "JOOBLE" },
-          "dataPublicacao": { "type": "string", "description": "Data de publicacao", "example": "30/03/2026 10:00" }
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID da vaga",
+            "example": 1
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Titulo da vaga",
+            "example": "Estagiario de Desenvolvimento Web"
+          },
+          "empresa": {
+            "type": "string",
+            "description": "Nome da empresa",
+            "example": "Tech Solutions LTDA"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descricao da vaga",
+            "example": "Vaga para desenvolvimento web com React e Spring Boot"
+          },
+          "localizacao": {
+            "type": "string",
+            "description": "Localizacao da vaga",
+            "example": "Mossoro, RN"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL da vaga original",
+            "example": "https://exemplo.com/vaga/123"
+          },
+          "fonte": {
+            "type": "string",
+            "description": "Fonte da vaga",
+            "example": "JOOBLE"
+          },
+          "dataPublicacao": {
+            "type": "string",
+            "description": "Data de publicacao",
+            "example": "30/03/2026 10:00"
+          }
         },
         "description": "Dados de uma vaga de estagio"
       },
       "SelecionarVagaRequest": {
-        "required": ["vagaId"],
+        "required": [
+          "vagaId"
+        ],
         "type": "object",
         "properties": {
-          "vagaId": { "type": "integer", "format": "int64", "description": "ID da vaga a ser selecionada", "example": 1 }
+          "vagaId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID da vaga a ser selecionada",
+            "example": 1
+          }
         },
         "description": "Dados para selecionar uma vaga"
       }
