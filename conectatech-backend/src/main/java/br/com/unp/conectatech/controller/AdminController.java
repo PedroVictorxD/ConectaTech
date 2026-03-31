@@ -10,6 +10,7 @@ import br.com.unp.conectatech.service.JoobleService;
 import br.com.unp.conectatech.service.ScraperService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -40,7 +41,7 @@ public class AdminController {
     @Operation(summary = "Listar usuarios", description = "Retorna todos os usuarios cadastrados")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista de usuarios"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado - requer role ADMIN")
+            @ApiResponse(responseCode = "403", description = "Acesso negado - requer role ADMIN", content = @Content)
     })
     public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
         return ResponseEntity.ok(adminService.listarUsuarios());
@@ -50,8 +51,8 @@ public class AdminController {
     @Operation(summary = "Buscar usuario por ID", description = "Retorna os dados de um usuario especifico")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
-            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado")
+            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
     })
     public ResponseEntity<UsuarioDTO> buscarUsuario(@Parameter(description = "ID do usuario") @PathVariable Long id) {
         return ResponseEntity.ok(adminService.buscarUsuarioPorId(id));
@@ -61,8 +62,8 @@ public class AdminController {
     @Operation(summary = "Atualizar usuario", description = "Atualiza os dados de um usuario")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Usuario atualizado"),
-            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado")
+            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
     })
     public ResponseEntity<UsuarioDTO> atualizarUsuario(@Parameter(description = "ID do usuario") @PathVariable Long id,
             @Valid @RequestBody UsuarioDTO dto) {
@@ -73,7 +74,7 @@ public class AdminController {
     @Operation(summary = "Executar scraping", description = "Executa o scraper manualmente para importar vagas de sites externos")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Scraping executado com quantidade de vagas importadas"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado")
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
     })
     public ResponseEntity<ImportResponse> importarScraper() {
         List<Vaga> vagas = scraperService.executarScraping();
@@ -84,7 +85,7 @@ public class AdminController {
     @Operation(summary = "Importar vagas do Jooble", description = "Busca e importa vagas da API Jooble para o banco de dados")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Importacao concluida com quantidade de vagas"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado")
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
     })
     public ResponseEntity<ImportResponse> importarJooble(
             @Parameter(description = "Palavras-chave para busca") @RequestParam(defaultValue = "estagio tecnologia") String keywords,
@@ -97,7 +98,7 @@ public class AdminController {
     @Operation(summary = "Listar todas as vagas (admin)", description = "Retorna todas as vagas cadastradas no sistema")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista de vagas"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado")
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
     })
     public ResponseEntity<List<VagaDTO>> listarVagas() {
         return ResponseEntity.ok(adminService.listarVagas());
@@ -107,7 +108,7 @@ public class AdminController {
     @Operation(summary = "Criar vaga manualmente", description = "Cadastra uma nova vaga com fonte ADMIN")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Vaga criada"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado")
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
     })
     public ResponseEntity<VagaDTO> criarVaga(@Valid @RequestBody VagaDTO dto) {
         return ResponseEntity.ok(adminService.criarVaga(dto));
@@ -117,8 +118,8 @@ public class AdminController {
     @Operation(summary = "Atualizar vaga", description = "Atualiza os dados de uma vaga existente")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Vaga atualizada"),
-            @ApiResponse(responseCode = "404", description = "Vaga nao encontrada"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado")
+            @ApiResponse(responseCode = "404", description = "Vaga nao encontrada", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
     })
     public ResponseEntity<VagaDTO> atualizarVaga(@Parameter(description = "ID da vaga") @PathVariable Long id,
             @Valid @RequestBody VagaDTO dto) {
@@ -129,8 +130,8 @@ public class AdminController {
     @Operation(summary = "Deletar vaga", description = "Remove permanentemente uma vaga do sistema")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Vaga removida"),
-            @ApiResponse(responseCode = "404", description = "Vaga nao encontrada"),
-            @ApiResponse(responseCode = "403", description = "Acesso negado")
+            @ApiResponse(responseCode = "404", description = "Vaga nao encontrada", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
     })
     public ResponseEntity<MessageResponse> deletarVaga(@Parameter(description = "ID da vaga") @PathVariable Long id) {
         adminService.deletarVaga(id);

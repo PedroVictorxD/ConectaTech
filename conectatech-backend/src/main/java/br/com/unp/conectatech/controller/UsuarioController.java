@@ -4,6 +4,7 @@ import br.com.unp.conectatech.dto.AtualizarUsuarioRequest;
 import br.com.unp.conectatech.dto.UsuarioDTO;
 import br.com.unp.conectatech.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,7 +30,7 @@ public class UsuarioController {
     @Operation(summary = "Ver meus dados", description = "Retorna os dados do estudante autenticado")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Dados do usuario"),
-            @ApiResponse(responseCode = "401", description = "Token JWT ausente ou invalido")
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente ou invalido", content = @Content)
     })
     public ResponseEntity<UsuarioDTO> meusDados(Authentication authentication) {
         String email = authentication.getName();
@@ -40,8 +41,8 @@ public class UsuarioController {
     @Operation(summary = "Atualizar meus dados", description = "Atualiza nome, curso e periodo do estudante autenticado")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Dados atualizados"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "401", description = "Token JWT ausente ou invalido")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente ou invalido", content = @Content)
     })
     public ResponseEntity<UsuarioDTO> atualizar(@Valid @RequestBody AtualizarUsuarioRequest request,
             Authentication authentication) {
