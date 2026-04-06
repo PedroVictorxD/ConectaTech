@@ -51,6 +51,7 @@ application-local.properties
 
 # === Docs internos ===
 docs/**/*.md
+CONTEXTO-PROJETO.md
 
 # === Maven Wrapper ===
 !.mvn/wrapper/maven-wrapper.jar
