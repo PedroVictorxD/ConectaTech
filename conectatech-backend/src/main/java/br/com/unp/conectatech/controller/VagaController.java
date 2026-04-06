@@ -2,6 +2,7 @@ package br.com.unp.conectatech.controller;
 
 import br.com.unp.conectatech.dto.SelecionarVagaRequest;
 import br.com.unp.conectatech.dto.VagaDTO;
+import br.com.unp.conectatech.service.InteresseService;
 import br.com.unp.conectatech.service.JoobleService;
 import br.com.unp.conectatech.service.VagaSelecionadaService;
 import br.com.unp.conectatech.service.VagaService;
@@ -29,11 +30,14 @@ public class VagaController {
     private final VagaService vagaService;
     private final VagaSelecionadaService vagaSelecionadaService;
     private final JoobleService joobleService;
+    private final InteresseService interesseService;
 
-    public VagaController(VagaService vagaService, VagaSelecionadaService vagaSelecionadaService, JoobleService joobleService) {
+    public VagaController(VagaService vagaService, VagaSelecionadaService vagaSelecionadaService,
+            JoobleService joobleService, InteresseService interesseService) {
         this.vagaService = vagaService;
         this.vagaSelecionadaService = vagaSelecionadaService;
         this.joobleService = joobleService;
+        this.interesseService = interesseService;
     }
 
     @GetMapping
@@ -115,5 +119,28 @@ public class VagaController {
         String email = authentication.getName();
         vagaSelecionadaService.removerSelecionada(email, vagaId);
         return ResponseEntity.ok(new MessageResponse("Vaga removida das selecionadas"));
+    }
+
+    @PostMapping("/{id}/interesse")
+    @Operation(summary = "Demonstrar interesse", description = "Aluno demonstra interesse em uma vaga", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Interesse registrado"),
+            @ApiResponse(responseCode = "400", description = "Interesse ja demonstrado", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Vaga nao encontrada", content = @Content)
+    })
+    public ResponseEntity<MessageResponse> demonstrarInteresse(@PathVariable Long id, Authentication authentication) {
+        interesseService.demonstrarInteresse(authentication.getName(), id);
+        return ResponseEntity.ok(new MessageResponse("Interesse demonstrado com sucesso"));
+    }
+
+    @DeleteMapping("/{id}/interesse")
+    @Operation(summary = "Remover interesse", description = "Aluno remove interesse em uma vaga", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Interesse removido"),
+            @ApiResponse(responseCode = "404", description = "Interesse nao encontrado", content = @Content)
+    })
+    public ResponseEntity<MessageResponse> removerInteresse(@PathVariable Long id, Authentication authentication) {
+        interesseService.removerInteresse(authentication.getName(), id);
+        return ResponseEntity.ok(new MessageResponse("Interesse removido com sucesso"));
     }
 }

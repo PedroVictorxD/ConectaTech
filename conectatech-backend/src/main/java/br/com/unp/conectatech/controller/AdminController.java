@@ -1,12 +1,15 @@
 package br.com.unp.conectatech.controller;
 
 import br.com.unp.conectatech.dto.ImportResponse;
+import br.com.unp.conectatech.dto.InteresseDTO;
 import br.com.unp.conectatech.dto.MessageResponse;
 import br.com.unp.conectatech.dto.UsuarioDTO;
 import br.com.unp.conectatech.dto.VagaDTO;
 import br.com.unp.conectatech.model.Vaga;
 import br.com.unp.conectatech.service.AdminService;
+import br.com.unp.conectatech.service.InteresseService;
 import br.com.unp.conectatech.service.JoobleService;
+import br.com.unp.conectatech.service.PrefeituraScraperService;
 import br.com.unp.conectatech.service.ScraperService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,11 +33,17 @@ public class AdminController {
     private final AdminService adminService;
     private final ScraperService scraperService;
     private final JoobleService joobleService;
+    private final PrefeituraScraperService prefeituraScraperService;
+    private final InteresseService interesseService;
 
-    public AdminController(AdminService adminService, ScraperService scraperService, JoobleService joobleService) {
+    public AdminController(AdminService adminService, ScraperService scraperService,
+            JoobleService joobleService, PrefeituraScraperService prefeituraScraperService,
+            InteresseService interesseService) {
         this.adminService = adminService;
         this.scraperService = scraperService;
         this.joobleService = joobleService;
+        this.prefeituraScraperService = prefeituraScraperService;
+        this.interesseService = interesseService;
     }
 
     @GetMapping("/users")
@@ -126,6 +135,17 @@ public class AdminController {
         return ResponseEntity.ok(adminService.atualizarVaga(id, dto));
     }
 
+    @PostMapping("/import-prefeitura")
+    @Operation(summary = "Importar vagas da Prefeitura", description = "Busca e importa vagas do Painel de Empregos da Prefeitura de Mossoro")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Importacao concluida com quantidade de vagas"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
+    })
+    public ResponseEntity<ImportResponse> importarPrefeitura() {
+        List<Vaga> vagas = prefeituraScraperService.importarVagas();
+        return ResponseEntity.ok(new ImportResponse("Importacao Prefeitura concluida", vagas.size()));
+    }
+
     @DeleteMapping("/jobs/{id}")
     @Operation(summary = "Deletar vaga", description = "Remove permanentemente uma vaga do sistema")
     @ApiResponses({
@@ -136,5 +156,15 @@ public class AdminController {
     public ResponseEntity<MessageResponse> deletarVaga(@Parameter(description = "ID da vaga") @PathVariable Long id) {
         adminService.deletarVaga(id);
         return ResponseEntity.ok(new MessageResponse("Vaga removida com sucesso"));
+    }
+
+    @GetMapping("/jobs/{id}/interessados")
+    @Operation(summary = "Ver interessados em uma vaga", description = "Lista os alunos que demonstraram interesse")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de interessados"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content)
+    })
+    public ResponseEntity<List<InteresseDTO>> listarInteressados(@PathVariable Long id) {
+        return ResponseEntity.ok(interesseService.listarInteressadosPorVaga(id));
     }
 }

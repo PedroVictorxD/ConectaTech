@@ -44,6 +44,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/empresa/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs/my-selections").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/jobs", "/api/jobs/{id}", "/api/jobs/search-external").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/jobs/*/interesse").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/jobs/*/interesse").authenticated()
                         .requestMatchers("/api/redator/**").hasRole("REDATOR")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/empresa/**").hasRole("EMPRESA")

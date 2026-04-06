@@ -1,10 +1,12 @@
 package br.com.unp.conectatech.controller;
 
 import br.com.unp.conectatech.dto.EmpresaDTO;
+import br.com.unp.conectatech.dto.InteresseDTO;
 import br.com.unp.conectatech.dto.MessageResponse;
 import br.com.unp.conectatech.dto.VagaDTO;
 import br.com.unp.conectatech.service.EmpresaService;
 import br.com.unp.conectatech.service.EmpresaVagaService;
+import br.com.unp.conectatech.service.InteresseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,10 +28,13 @@ public class EmpresaController {
 
     private final EmpresaVagaService empresaVagaService;
     private final EmpresaService empresaService;
+    private final InteresseService interesseService;
 
-    public EmpresaController(EmpresaVagaService empresaVagaService, EmpresaService empresaService) {
+    public EmpresaController(EmpresaVagaService empresaVagaService, EmpresaService empresaService,
+            InteresseService interesseService) {
         this.empresaVagaService = empresaVagaService;
         this.empresaService = empresaService;
+        this.interesseService = interesseService;
     }
 
     @GetMapping("/jobs")
@@ -82,5 +87,16 @@ public class EmpresaController {
     public ResponseEntity<EmpresaDTO> atualizarPerfil(@Valid @RequestBody EmpresaDTO dto,
             Authentication authentication) {
         return ResponseEntity.ok(empresaService.atualizarPorEmail(authentication.getName(), dto));
+    }
+
+    @GetMapping("/jobs/{id}/interessados")
+    @Operation(summary = "Ver interessados na vaga", description = "Lista alunos interessados em uma vaga da empresa")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de interessados"),
+            @ApiResponse(responseCode = "403", description = "Vaga nao pertence a esta empresa", content = @Content)
+    })
+    public ResponseEntity<List<InteresseDTO>> listarInteressados(@PathVariable Long id, Authentication authentication) {
+        empresaVagaService.validarVagaDaEmpresa(authentication.getName(), id);
+        return ResponseEntity.ok(interesseService.listarInteressadosPorVaga(id));
     }
 }
