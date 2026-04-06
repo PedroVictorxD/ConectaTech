@@ -101,6 +101,7 @@ public class VagaService {
                 .localizacao(vaga.getLocalizacao())
                 .url(vaga.getUrl())
                 .fonte(vaga.getFonte().name())
+                .empresaNome(vaga.getEmpresaVinculada() != null ? vaga.getEmpresaVinculada().getNome() : null)
                 .dataPublicacao(vaga.getDataPublicacao() != null
                         ? vaga.getDataPublicacao().format(FORMATTER)
                         : null)

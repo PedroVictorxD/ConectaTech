@@ -18,6 +18,8 @@ public interface VagaRepository extends JpaRepository<Vaga, Long> {
 
     boolean existsByUrl(String url);
 
+    List<Vaga> findByEmpresaVinculadaId(Long empresaId);
+
     @Query("SELECT v FROM Vaga v WHERE " +
            "(COALESCE(:busca, '') = '' OR (LOWER(v.titulo) LIKE LOWER(CONCAT('%', :busca, '%')) " +
            "OR LOWER(v.empresa) LIKE LOWER(CONCAT('%', :busca, '%')) " +

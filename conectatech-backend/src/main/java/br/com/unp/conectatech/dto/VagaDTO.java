@@ -37,6 +37,9 @@ public class VagaDTO {
     @Schema(description = "Fonte da vaga", example = "JOOBLE")
     private String fonte;
 
+    @Schema(description = "Nome da empresa vinculada", example = "Tech Solutions LTDA")
+    private String empresaNome;
+
     @Schema(description = "Data de publicacao", example = "30/03/2026 10:00")
     private String dataPublicacao;
 }

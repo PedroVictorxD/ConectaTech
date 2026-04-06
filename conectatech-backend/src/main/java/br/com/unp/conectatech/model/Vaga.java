@@ -34,6 +34,10 @@ public class Vaga {
     @Column(nullable = false)
     private FonteVaga fonte;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresaVinculada;
+
     private LocalDateTime dataPublicacao;
 
     @Column(updatable = false)
