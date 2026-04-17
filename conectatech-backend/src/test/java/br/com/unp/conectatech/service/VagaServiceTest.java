@@ -1,5 +1,6 @@
 package br.com.unp.conectatech.service;
 
+import br.com.unp.conectatech.dto.PagedVagaResponse;
 import br.com.unp.conectatech.dto.VagaDTO;
 import br.com.unp.conectatech.exception.ResourceNotFoundException;
 import br.com.unp.conectatech.model.FonteVaga;
@@ -97,35 +98,36 @@ class VagaServiceTest {
 
     @Test
     void buscarComFiltros_porBusca_filtraPorTitulo() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros("Java", null, null);
-        assertEquals(1, vagas.size());
-        assertEquals("Estagiario Java", vagas.get(0).getTitulo());
+        PagedVagaResponse result = vagaService.buscarComFiltros("Java", null, null, 0, 10, "dataPublicacao,desc");
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Estagiario Java", result.getContent().get(0).getTitulo());
     }
 
     @Test
     void buscarComFiltros_porLocalizacao_filtra() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros(null, "Mossoro", null);
-        assertEquals(2, vagas.size());
+        PagedVagaResponse result = vagaService.buscarComFiltros(null, "Mossoro", null, 0, 10, "dataPublicacao,desc");
+        assertEquals(2, result.getTotalElements());
     }
 
     @Test
     void buscarComFiltros_porFonte_filtra() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros(null, null, "JSOUP");
-        assertEquals(1, vagas.size());
-        assertEquals("Analista RH", vagas.get(0).getTitulo());
+        PagedVagaResponse result = vagaService.buscarComFiltros(null, null, "JSOUP", 0, 10, "dataPublicacao,desc");
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Analista RH", result.getContent().get(0).getTitulo());
     }
 
     @Test
     void buscarComFiltros_fonteInvalida_retornaTodas() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros(null, null, "INVALIDA");
-        assertEquals(3, vagas.size());
+        PagedVagaResponse result = vagaService.buscarComFiltros(null, null, "INVALIDA", 0, 10, "dataPublicacao,desc");
+        assertEquals(3, result.getTotalElements());
     }
 
     @Test
     void buscarComFiltros_combinado_filtra() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros("Estagiario", "Mossoro", null);
-        assertEquals(1, vagas.size());
-        assertEquals("Estagiario Java", vagas.get(0).getTitulo());
+        PagedVagaResponse result = vagaService.buscarComFiltros("Estagiario", "Mossoro", null, 0, 10,
+                "dataPublicacao,desc");
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Estagiario Java", result.getContent().get(0).getTitulo());
     }
 
     @Test

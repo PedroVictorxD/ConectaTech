@@ -1,5 +1,7 @@
 package br.com.unp.conectatech.controller;
 
+import br.com.unp.conectatech.dto.MessageResponse;
+import br.com.unp.conectatech.dto.PagedVagaResponse;
 import br.com.unp.conectatech.dto.SelecionarVagaRequest;
 import br.com.unp.conectatech.dto.VagaDTO;
 import br.com.unp.conectatech.service.InteresseService;
@@ -17,8 +19,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import br.com.unp.conectatech.dto.MessageResponse;
 
 import java.util.List;
 
@@ -41,19 +41,16 @@ public class VagaController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar vagas", description = "Lista todas as vagas com filtros opcionais por texto, localizacao e fonte")
-    @ApiResponse(responseCode = "200", description = "Lista de vagas retornada")
-    public ResponseEntity<List<VagaDTO>> listarTodas(
+    @Operation(summary = "Listar vagas", description = "Lista vagas com filtros e paginacao opcionais")
+    @ApiResponse(responseCode = "200", description = "Lista paginada de vagas retornada")
+    public ResponseEntity<PagedVagaResponse> listarTodas(
             @Parameter(description = "Texto para buscar em titulo, empresa e descricao") @RequestParam(required = false) String busca,
             @Parameter(description = "Filtrar por localizacao (ex: Mossoro)") @RequestParam(required = false) String localizacao,
-            @Parameter(description = "Filtrar por fonte: JOOBLE, JSOUP ou ADMIN") @RequestParam(required = false) String fonte) {
-        List<VagaDTO> vagas;
-        if ((busca != null && !busca.isBlank()) || (localizacao != null && !localizacao.isBlank()) || (fonte != null && !fonte.isBlank())) {
-            vagas = vagaService.buscarComFiltros(busca, localizacao, fonte);
-        } else {
-            vagas = vagaService.listarTodas();
-        }
-        return ResponseEntity.ok(vagas);
+            @Parameter(description = "Filtrar por fonte: JOOBLE, JSOUP, ADMIN, PREFEITURA ou EMPRESA") @RequestParam(required = false) String fonte,
+            @Parameter(description = "Numero da pagina (0-based)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Itens por pagina") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Ordenacao: campo,direcao ex: dataPublicacao,desc") @RequestParam(defaultValue = "dataPublicacao,desc") String sort) {
+        return ResponseEntity.ok(vagaService.buscarComFiltros(busca, localizacao, fonte, page, size, sort));
     }
 
     @GetMapping("/search-external")
@@ -114,7 +111,8 @@ public class VagaController {
             @ApiResponse(responseCode = "200", description = "Vaga removida das selecionadas"),
             @ApiResponse(responseCode = "401", description = "Token JWT ausente ou invalido", content = @Content)
     })
-    public ResponseEntity<MessageResponse> removerSelecionada(@Parameter(description = "ID da vaga") @PathVariable Long vagaId,
+    public ResponseEntity<MessageResponse> removerSelecionada(
+            @Parameter(description = "ID da vaga") @PathVariable Long vagaId,
             Authentication authentication) {
         String email = authentication.getName();
         vagaSelecionadaService.removerSelecionada(email, vagaId);
