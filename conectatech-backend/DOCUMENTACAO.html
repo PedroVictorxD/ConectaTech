@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>ConectaTech API - Documentacao do Projeto</title>
+    <style>
+        @page { margin: 2cm; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #1a56db;
+            border-bottom: 3px solid #1a56db;
+            padding-bottom: 10px;
+            font-size: 28px;
+        }
+        h2 {
+            color: #1e40af;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 6px;
+            margin-top: 35px;
+            font-size: 20px;
+        }
+        h3 {
+            color: #374151;
+            font-size: 16px;
+            margin-top: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #eff6ff;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) { background-color: #f9fafb; }
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #dc2626;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        .get { background: #22c55e; }
+        .post { background: #3b82f6; }
+        .put { background: #f59e0b; }
+        .delete { background: #ef4444; }
+        .section-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px 0;
+        }
+        .step-number {
+            background: #1a56db;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .header-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header-info p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .tech-item {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .tech-item strong { color: #1e40af; }
+        @media print {
+            body { padding: 0; }
+            h2 { page-break-after: avoid; }
+            table { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-info">
+    <h1>ConectaTech API</h1>
+    <p>Plataforma que conecta estudantes da UNP a vagas de estagio na regiao de Mossoro/RN</p>
+    <p>Projeto de Extensao Universitaria &mdash; Universidade Potiguar (UNP)</p>
+    <p>Versao 1.0.0 &mdash; Marco 2026</p>
+</div>
+
+<h2>1. Visao Geral</h2>
+<p>
+    O ConectaTech e uma API REST que agrega vagas de estagio de multiplas fontes (API Jooble, web scraping e cadastro manual)
+    e disponibiliza para estudantes universitarios de Mossoro/RN. Os estudantes podem buscar, filtrar e selecionar vagas de interesse
+    atraves de uma interface simples e segura.
+</p>
+
+<h2>2. Stack Tecnologica</h2>
+<div class="tech-grid">
+    <div class="tech-item"><strong>Java 17</strong><br>Linguagem</div>
+    <div class="tech-item"><strong>Spring Boot 3.2.5</strong><br>Framework</div>
+    <div class="tech-item"><strong>Spring Security</strong><br>Autenticacao JWT</div>
+    <div class="tech-item"><strong>Spring Data JPA</strong><br>Persistencia</div>
+    <div class="tech-item"><strong>PostgreSQL</strong><br>Banco de Dados</div>
+    <div class="tech-item"><strong>H2 Database</strong><br>Testes</div>
+    <div class="tech-item"><strong>SpringDoc OpenAPI</strong><br>Documentacao Swagger</div>
+    <div class="tech-item"><strong>JSoup</strong><br>Web Scraping</div>
+    <div class="tech-item"><strong>Maven</strong><br>Build Tool</div>
+</div>
+
+<h2>3. Arquitetura</h2>
+<div class="section-box">
+    <p>O projeto segue uma arquitetura em camadas:</p>
+    <table>
+        <tr><th>Camada</th><th>Responsabilidade</th><th>Pacote</th></tr>
+        <tr><td>Controller</td><td>Recebe requisicoes HTTP e retorna respostas</td><td><code>controller/</code></td></tr>
+        <tr><td>Service</td><td>Logica de negocio</td><td><code>service/</code></td></tr>
+        <tr><td>Repository</td><td>Acesso ao banco de dados (JPA)</td><td><code>repository/</code></td></tr>
+        <tr><td>Model</td><td>Entidades JPA mapeadas para tabelas</td><td><code>model/</code></td></tr>
+        <tr><td>DTO</td><td>Objetos de transferencia entre camadas</td><td><code>dto/</code></td></tr>
+        <tr><td>Security</td><td>Autenticacao e autorizacao JWT</td><td><code>security/</code></td></tr>
+        <tr><td>Config</td><td>Configuracoes do Spring (CORS, Swagger, Security)</td><td><code>config/</code></td></tr>
+        <tr><td>Exception</td><td>Tratamento global de erros</td><td><code>exception/</code></td></tr>
+    </table>
+</div>
+
+<h2>4. Modelo de Dados</h2>
+<h3>4.1 Usuario</h3>
+<table>
+    <tr><th>Campo</th><th>Tipo</th><th>Descricao</th></tr>
+    <tr><td>id</td><td>Long</td><td>Identificador unico (auto-gerado)</td></tr>
+    <tr><td>nome</td><td>String</td><td>Nome completo</td></tr>
+    <tr><td>email</td><td>String</td><td>Email unico</td></tr>
+    <tr><td>senha</td><td>String</td><td>Hash BCrypt</td></tr>
+    <tr><td>curso</td><td>String</td><td>Curso do estudante</td></tr>
+    <tr><td>periodo</td><td>String</td><td>Periodo atual</td></tr>
+    <tr><td>role</td><td>Enum</td><td>STUDENT ou ADMIN</td></tr>
+    <tr><td>criadoEm</td><td>LocalDateTime</td><td>Data de criacao</td></tr>
+</table>
+
+<h3>4.2 Vaga</h3>
+<table>
+    <tr><th>Campo</th><th>Tipo</th><th>Descricao</th></tr>
+    <tr><td>id</td><td>Long</td><td>Identificador unico</td></tr>
+    <tr><td>titulo</td><td>String</td><td>Titulo da vaga</td></tr>
+    <tr><td>empresa</td><td>String</td><td>Nome da empresa</td></tr>
+    <tr><td>descricao</td><td>String</td><td>Descricao da vaga</td></tr>
+    <tr><td>localizacao</td><td>String</td><td>Cidade/estado</td></tr>
+    <tr><td>url</td><td>String</td><td>Link original da vaga</td></tr>
+    <tr><td>fonte</td><td>Enum</td><td>JOOBLE, JSOUP ou ADMIN</td></tr>
+    <tr><td>dataPublicacao</td><td>LocalDateTime</td><td>Data de publicacao</td></tr>
+</table>
+
+<h3>4.3 VagaSelecionada</h3>
+<table>
+    <tr><th>Campo</th><th>Tipo</th><th>Descricao</th></tr>
+    <tr><td>id</td><td>Long</td><td>Identificador unico</td></tr>
+    <tr><td>usuario</td><td>Usuario</td><td>Referencia ao estudante (ManyToOne)</td></tr>
+    <tr><td>vaga</td><td>Vaga</td><td>Referencia a vaga (ManyToOne)</td></tr>
+    <tr><td>dataSelecionada</td><td>LocalDateTime</td><td>Quando foi selecionada</td></tr>
+</table>
+
+<h2>5. Fontes de Vagas</h2>
+<div class="section-box">
+    <h3>5.1 Jooble API</h3>
+    <p>O <code>JoobleService</code> faz requisicoes POST para a API do Jooble com palavras-chave e localizacao, parseia o JSON retornado e salva as vagas no banco de dados. Evita duplicatas verificando a URL.</p>
+
+    <h3>5.2 Web Scraping (JSoup)</h3>
+    <p>O <code>ScraperService</code> acessa sites configurados via seletores CSS, extrai titulo, empresa, descricao, localizacao e link das vagas. Pode rodar via cron (agendado) ou manualmente pelo admin.</p>
+
+    <h3>5.3 Cadastro Manual</h3>
+    <p>O administrador pode criar vagas manualmente via <code>POST /api/admin/jobs</code>. A fonte e automaticamente definida como ADMIN.</p>
+</div>
+
+<h2>6. Fluxo de Autenticacao</h2>
+<div class="section-box">
+    <div class="flow-step">
+        <div class="step-number">1</div>
+        <div>Estudante se registra via <code>POST /api/auth/register</code> com nome, email, senha, curso e periodo</div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">2</div>
+        <div>Sistema cria usuario com role STUDENT e senha criptografada com BCrypt</div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">3</div>
+        <div>Estudante faz login via <code>POST /api/auth/login</code> e recebe um token JWT (valido por 24h)</div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">4</div>
+        <div>Nas proximas requisicoes, envia o token no header <code>Authorization: Bearer &lt;token&gt;</code></div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">5</div>
+        <div>O <code>JwtAuthFilter</code> intercepta cada requisicao, valida o token e define o contexto de seguranca</div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">6</div>
+        <div>O Spring Security verifica se o usuario tem permissao para acessar o endpoint solicitado</div>
+    </div>
+</div>
+
+<h2>7. Mapa de Endpoints</h2>
+
+<h3>7.1 Autenticacao (publicos)</h3>
+<table>
+    <tr><th>Metodo</th><th>Endpoint</th><th>Descricao</th></tr>
+    <tr><td><span class="badge post">POST</span></td><td><code>/api/auth/register</code></td><td>Registrar novo estudante</td></tr>
+    <tr><td><span class="badge post">POST</span></td><td><code>/api/auth/login</code></td><td>Login (retorna JWT)</td></tr>
+    <tr><td><span class="badge post">POST</span></td><td><code>/api/auth/forgot-password</code></td><td>Solicitar token de recuperacao de senha</td></tr>
+    <tr><td><span class="badge put">PUT</span></td><td><code>/api/auth/reset-password</code></td><td>Alterar senha com token de recuperacao</td></tr>
+</table>
+
+<h3>7.2 Vagas (publicos)</h3>
+<table>
+    <tr><th>Metodo</th><th>Endpoint</th><th>Descricao</th></tr>
+    <tr><td><span class="badge get">GET</span></td><td><code>/api/jobs</code></td><td>Listar vagas com filtros (busca, localizacao, fonte)</td></tr>
+    <tr><td><span class="badge get">GET</span></td><td><code>/api/jobs/{id}</code></td><td>Buscar vaga por ID</td></tr>
+    <tr><td><span class="badge get">GET</span></td><td><code>/api/jobs/search-external</code></td><td>Importar e buscar vagas externas (Jooble)</td></tr>
+</table>
+
+<h3>7.3 Estudante (requer token JWT)</h3>
+<table>
+    <tr><th>Metodo</th><th>Endpoint</th><th>Descricao</th></tr>
+    <tr><td><span class="badge get">GET</span></td><td><code>/api/profile</code></td><td>Ver dados do perfil</td></tr>
+    <tr><td><span class="badge put">PUT</span></td><td><code>/api/profile</code></td><td>Atualizar nome, curso e periodo</td></tr>
+    <tr><td><span class="badge post">POST</span></td><td><code>/api/jobs/select</code></td><td>Selecionar uma vaga de interesse</td></tr>
+    <tr><td><span class="badge get">GET</span></td><td><code>/api/jobs/my-selections</code></td><td>Listar vagas selecionadas</td></tr>
+    <tr><td><span class="badge delete">DELETE</span></td><td><code>/api/jobs/my-selections/{vagaId}</code></td><td>Remover vaga da lista</td></tr>
+</table>
+
+<h3>7.4 Administracao (requer token JWT + role ADMIN)</h3>
+<table>
+    <tr><th>Metodo</th><th>Endpoint</th><th>Descricao</th></tr>
+    <tr><td><span class="badge get">GET</span></td><td><code>/api/admin/users</code></td><td>Listar todos os usuarios</td></tr>
+    <tr><td><span class="badge get">GET</span></td><td><code>/api/admin/users/{id}</code></td><td>Buscar usuario por ID</td></tr>
+    <tr><td><span class="badge put">PUT</span></td><td><code>/api/admin/users/{id}</code></td><td>Atualizar usuario</td></tr>
+    <tr><td><span class="badge get">GET</span></td><td><code>/api/admin/jobs</code></td><td>Listar todas as vagas</td></tr>
+    <tr><td><span class="badge post">POST</span></td><td><code>/api/admin/jobs</code></td><td>Criar vaga manualmente</td></tr>
+    <tr><td><span class="badge put">PUT</span></td><td><code>/api/admin/jobs/{id}</code></td><td>Atualizar vaga</td></tr>
+    <tr><td><span class="badge delete">DELETE</span></td><td><code>/api/admin/jobs/{id}</code></td><td>Remover vaga</td></tr>
+    <tr><td><span class="badge post">POST</span></td><td><code>/api/admin/import-scraper</code></td><td>Executar scraping manual</td></tr>
+    <tr><td><span class="badge post">POST</span></td><td><code>/api/admin/import-jooble</code></td><td>Importar vagas do Jooble</td></tr>
+</table>
+
+<h2>8. Seguranca</h2>
+<div class="section-box">
+    <table>
+        <tr><th>Mecanismo</th><th>Implementacao</th></tr>
+        <tr><td>Autenticacao</td><td>JWT (JSON Web Token) com HMAC-SHA384</td></tr>
+        <tr><td>Criptografia de senha</td><td>BCrypt via Spring Security</td></tr>
+        <tr><td>Autorizacao</td><td>Role-based (STUDENT e ADMIN)</td></tr>
+        <tr><td>CORS</td><td>Configuravel por profile (dev: *, prod: restrito)</td></tr>
+        <tr><td>CSRF</td><td>Desabilitado (API stateless)</td></tr>
+        <tr><td>Sessao</td><td>Stateless (sem sessao no servidor)</td></tr>
+        <tr><td>Validade do token</td><td>24 horas</td></tr>
+        <tr><td>Recuperacao de senha</td><td>Token UUID com expiracao de 1 hora</td></tr>
+    </table>
+</div>
+
+<h2>9. Fluxo do Estudante</h2>
+<div class="section-box">
+    <div class="flow-step">
+        <div class="step-number">1</div>
+        <div><strong>Registro</strong> &mdash; Cria conta com nome, email, senha, curso e periodo</div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">2</div>
+        <div><strong>Login</strong> &mdash; Autentica e recebe token JWT</div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">3</div>
+        <div><strong>Buscar vagas</strong> &mdash; Navega e filtra vagas por texto, localizacao ou fonte</div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">4</div>
+        <div><strong>Selecionar</strong> &mdash; Adiciona vagas de interesse a sua lista pessoal</div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">5</div>
+        <div><strong>Gerenciar</strong> &mdash; Consulta e remove vagas selecionadas quando necessario</div>
+    </div>
+    <div class="flow-step">
+        <div class="step-number">6</div>
+        <div><strong>Perfil</strong> &mdash; Atualiza dados pessoais (nome, curso, periodo)</div>
+    </div>
+</div>
+
+<h2>10. Testes Automatizados</h2>
+<p>O projeto possui <strong>118 testes</strong> de integracao e unitarios, cobrindo todas as camadas:</p>
+<table>
+    <tr><th>Classe de Teste</th><th>Qtd</th><th>Cobertura</th></tr>
+    <tr><td>AuthControllerTest</td><td>12</td><td>Register, login, forgot/reset password, validacoes</td></tr>
+    <tr><td>VagaControllerTest</td><td>12</td><td>Listar, buscar, filtrar, selecionar, remover</td></tr>
+    <tr><td>UsuarioControllerTest</td><td>5</td><td>Get/update profile, autenticacao</td></tr>
+    <tr><td>AdminControllerTest</td><td>13</td><td>CRUD users/jobs, controle de acesso</td></tr>
+    <tr><td>SecurityTest</td><td>8</td><td>Endpoints publicos, autenticados, admin, token invalido</td></tr>
+    <tr><td>JwtUtilTest</td><td>8</td><td>Gerar, extrair, validar, expirar tokens</td></tr>
+    <tr><td>AuthServiceTest</td><td>9</td><td>Registrar, login, recuperar/alterar senha</td></tr>
+    <tr><td>VagaServiceTest</td><td>17</td><td>CRUD, filtros, busca, edge cases</td></tr>
+    <tr><td>VagaSelecionadaServiceTest</td><td>9</td><td>Selecionar, listar, remover, duplicata</td></tr>
+    <tr><td>AdminServiceTest</td><td>12</td><td>CRUD usuarios/vagas, role invalida</td></tr>
+    <tr><td>UsuarioServiceTest</td><td>6</td><td>Buscar por email, atualizar, conversao DTO</td></tr>
+    <tr><td>ScraperServiceTest</td><td>3</td><td>URL invalida, resiliencia</td></tr>
+    <tr><td>JoobleServiceTest</td><td>3</td><td>API key invalida, resiliencia</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>118</strong></td><td></td></tr>
+</table>
+
+<h2>11. Profiles de Execucao</h2>
+<table>
+    <tr><th>Profile</th><th>Banco</th><th>DDL</th><th>CORS</th><th>Uso</th></tr>
+    <tr><td><code>dev</code></td><td>PostgreSQL local</td><td>update</td><td>*</td><td>Desenvolvimento</td></tr>
+    <tr><td><code>prod</code></td><td>PostgreSQL (env vars)</td><td>validate</td><td>Restrito</td><td>Producao</td></tr>
+    <tr><td><code>test</code></td><td>H2 em memoria</td><td>create-drop</td><td>*</td><td>Testes automatizados</td></tr>
+</table>
+
+<h2>12. Como Executar</h2>
+<div class="section-box">
+    <h3>Pre-requisitos</h3>
+    <p>Java 17+, Maven 3.8+, PostgreSQL 14+</p>
+
+    <h3>Desenvolvimento</h3>
+    <p><code>./mvnw spring-boot:run -Dspring-boot.run.profiles=dev</code></p>
+
+    <h3>Testes</h3>
+    <p><code>./mvnw test</code></p>
+
+    <h3>Swagger UI</h3>
+    <p>Dinamico: <code>http://localhost:8080/swagger-ui.html</code></p>
+    <p>Estatico: <code>https://pedrovictorxd.github.io/ConectaTech/</code></p>
+</div>
+
+<h2>13. Repositorio</h2>
+<div class="section-box">
+    <p><strong>GitHub:</strong> <code>https://github.com/PedroVictorxD/ConectaTech</code></p>
+    <p><strong>Branch principal:</strong> <code>develop</code></p>
+    <p><strong>Swagger online:</strong> <code>https://pedrovictorxd.github.io/ConectaTech/</code></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste ConectaTech API</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; background-color: #f5f5f5; }
+        .container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .vaga { border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; border-radius: 6px; background-color: #fafafa; }
+        .vaga h3 { margin-top: 0; color: #333; }
+        .fonte-badge { display: inline-block; padding: 3px 8px; color: white; border-radius: 12px; font-size: 12px; }
+        .fonte-JOOBLE { background-color: #007bff; }
+        .fonte-JSOUP { background-color: #6f42c1; }
+        .fonte-ADMIN { background-color: #28a745; }
+        .hidden { display: none; }
+        input[type="email"], input[type="password"], input[type="text"], select {
+            width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+        button { color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin: 3px; }
+        button:hover { opacity: 0.85; }
+        .btn-green { background-color: #28a745; }
+        .btn-blue { background-color: #007bff; }
+        .btn-purple { background-color: #6f42c1; }
+        .btn-cyan { background-color: #17a2b8; }
+        .btn-gray { background-color: #6c757d; }
+        .filtros { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .filtros input, .filtros select { width: auto; flex: 1; min-width: 150px; margin: 0; }
+        .stats { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .stat-card { padding: 10px 15px; border-radius: 6px; color: white; font-weight: bold; }
+        #login-msg { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>ConectaTech - Teste de API</h1>
+
+    <div id="login-section" class="container">
+        <h2>Login</h2>
+        <input type="email" id="email" placeholder="Email" value="teste@unp.br">
+        <input type="password" id="senha" placeholder="Senha" value="teste123">
+        <button class="btn-green" onclick="login()">Entrar</button>
+        <p id="login-msg"></p>
+    </div>
+
+    <div id="painel" class="container hidden">
+        <h2>Painel de Vagas</h2>
+
+        <div class="stats" id="stats"></div>
+
+        <h3>Filtros</h3>
+        <div class="filtros">
+            <input type="text" id="filtro-busca" placeholder="Buscar por titulo...">
+            <input type="text" id="filtro-local" placeholder="Localização...">
+            <select id="filtro-fonte">
+                <option value="">Todas as fontes</option>
+                <option value="JOOBLE">Jooble</option>
+                <option value="JSOUP">Scraper</option>
+                <option value="ADMIN">Admin</option>
+            </select>
+            <button class="btn-blue" onclick="buscarVagas()">Buscar</button>
+        </div>
+
+        <h3>Importar Vagas</h3>
+        <div class="filtros">
+            <input type="text" id="jooble-keywords" placeholder="Keywords (ex: developer)" value="developer">
+            <input type="text" id="jooble-location" placeholder="Location (ex: Mossoró, RN, Brazil)" value="Mossoró, RN, Brazil">
+            <button class="btn-purple" onclick="importarJooble()">Importar do Jooble</button>
+            <button class="btn-cyan" onclick="importarScraper()">Executar Scraper</button>
+        </div>
+
+        <h3>Admin</h3>
+        <div>
+            <button class="btn-green" onclick="criarVagaTeste()">Criar Vaga de Teste</button>
+        </div>
+
+        <hr>
+        <div id="vagas-lista">Clique em Buscar para carregar as vagas...</div>
+    </div>
+
+    <script>
+        let token = '';
+        const apiUrl = 'http://localhost:8080/api';
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const msg = document.getElementById('login-msg');
+            msg.innerText = "Autenticando...";
+            msg.style.color = "blue";
+
+            try {
+                const res = await fetch(`${apiUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    token = data.token;
+                    msg.innerText = "Login OK! Bem-vindo(a), " + data.nome + " (" + data.role + ")";
+                    msg.style.color = "green";
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('painel').classList.remove('hidden');
+                    buscarVagas();
+                } else {
+                    const error = await res.json();
+                    msg.innerText = "Erro: " + (error.message || res.status);
+                    msg.style.color = "red";
+                }
+            } catch (error) {
+                msg.innerText = "Falha na conexao: " + error.message;
+                msg.style.color = "red";
+            }
+        }
+
+        async function buscarVagas() {
+            const lista = document.getElementById('vagas-lista');
+            lista.innerHTML = "Carregando...";
+
+            const busca = document.getElementById('filtro-busca').value;
+            const local = document.getElementById('filtro-local').value;
+            const fonte = document.getElementById('filtro-fonte').value;
+
+            let url = `${apiUrl}/vagas?`;
+            if (busca) url += `busca=${encodeURIComponent(busca)}&`;
+            if (local) url += `localizacao=${encodeURIComponent(local)}&`;
+            if (fonte) url += `fonte=${encodeURIComponent(fonte)}&`;
+
+            try {
+                const res = await fetch(url);
+                if (res.ok) {
+                    const vagas = await res.json();
+                    atualizarStats(vagas);
+
+                    if (vagas.length === 0) {
+                        lista.innerHTML = "<p><i>Nenhuma vaga encontrada.</i></p>";
+                        return;
+                    }
+
+                    lista.innerHTML = '';
+                    vagas.forEach(v => {
+                        lista.innerHTML += `
+                            <div class="vaga">
+                                <h3>${v.titulo}</h3>
+                                <p><strong>Empresa:</strong> ${v.empresa} | <strong>Local:</strong> ${v.localizacao || 'N/A'}</p>
+                                <p>${v.descricao || ''}</p>
+                                <p><span class="fonte-badge fonte-${v.fonte}">${v.fonte}</span> Publicado: ${v.dataPublicacao || 'N/A'}</p>
+                                <a href="${v.url}" target="_blank" style="color: #007bff;">Ver vaga completa</a>
+                            </div>
+                        `;
+                    });
+                } else {
+                    lista.innerHTML = "Erro ao buscar vagas: HTTP " + res.status;
+                }
+            } catch (error) {
+                lista.innerHTML = "Erro de conexao: " + error.message;
+            }
+        }
+
+        function atualizarStats(vagas) {
+            const stats = document.getElementById('stats');
+            const total = vagas.length;
+            const jooble = vagas.filter(v => v.fonte === 'JOOBLE').length;
+            const jsoup = vagas.filter(v => v.fonte === 'JSOUP').length;
+            const admin = vagas.filter(v => v.fonte === 'ADMIN').length;
+
+            stats.innerHTML = `
+                <div class="stat-card" style="background:#333;">Total: ${total}</div>
+                <div class="stat-card fonte-JOOBLE">Jooble: ${jooble}</div>
+                <div class="stat-card fonte-JSOUP">Scraper: ${jsoup}</div>
+                <div class="stat-card fonte-ADMIN">Admin: ${admin}</div>
+            `;
+        }
+
+        async function importarJooble() {
+            const keywords = document.getElementById('jooble-keywords').value;
+            const location = document.getElementById('jooble-location').value;
+
+            const lista = document.getElementById('vagas-lista');
+            lista.innerHTML = "Importando vagas do Jooble... aguarde.";
+
+            try {
+                const res = await fetch(`${apiUrl}/admin/importar-jooble?keywords=${encodeURIComponent(keywords)}&location=${encodeURIComponent(location)}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    alert(`Importacao concluida! ${data.vagasImportadas} novas vagas importadas.`);
+                    document.getElementById('filtro-busca').value = '';
+                    document.getElementById('filtro-local').value = '';
+                    document.getElementById('filtro-fonte').value = '';
+                    buscarVagas();
+                } else {
+                    alert("Erro ao importar. Verifique se seu usuario e ADMIN.");
+                    buscarVagas();
+                }
+            } catch(e) {
+                alert("Erro: " + e.message);
+            }
+        }
+
+        async function importarScraper() {
+            const lista = document.getElementById('vagas-lista');
+            lista.innerHTML = "Executando scraper... aguarde.";
+
+            try {
+                const res = await fetch(`${apiUrl}/admin/importar-scraper`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    alert(`Scraping finalizado! ${data.vagasImportadas} novas vagas importadas.`);
+                    document.getElementById('filtro-busca').value = '';
+                    document.getElementById('filtro-local').value = '';
+                    document.getElementById('filtro-fonte').value = '';
+                    buscarVagas();
+                } else {
+                    alert("Erro ao rodar scraper. Verifique se seu usuario e ADMIN.");
+                    buscarVagas();
+                }
+            } catch(e) {
+                alert("Erro: " + e.message);
+            }
+        }
+
+        async function criarVagaTeste() {
+            const num = Math.floor(Math.random() * 1000);
+            try {
+                const res = await fetch(`${apiUrl}/admin/vagas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        titulo: `Vaga de Estagio Teste #${num}`,
+                        empresa: "Empresa Parceira da UNP",
+                        descricao: "Vaga criada manualmente pelo painel de teste.",
+                        localizacao: "Mossoro, RN",
+                        url: "https://www.unp.br",
+                        fonte: "ADMIN"
+                    })
+                });
+                if (res.ok) {
+                    alert("Vaga criada com sucesso!");
+                    buscarVagas();
+                } else {
+                    alert("Erro ao criar vaga! Verifique se seu usuario e ADMIN.");
+                }
+            } catch(e) {
+                alert("Erro: " + e.message);
+            }
+        }
+    </script>
+</body>
+</html>

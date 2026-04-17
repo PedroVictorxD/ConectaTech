@@ -1,5 +1,6 @@
 package br.com.unp.conectatech.dto;
 
+import br.com.unp.conectatech.validation.ValidCnpj;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -25,7 +26,8 @@ public class EmpresaRegistroRequest {
     private String senha;
 
     @NotBlank(message = "CNPJ é obrigatório")
-    @Schema(description = "CNPJ da empresa", example = "12.345.678/0001-99")
+    @ValidCnpj
+    @Schema(description = "CNPJ da empresa", example = "11.222.333/0001-81")
     private String cnpj;
 
     @NotBlank(message = "Telefone é obrigatório")
