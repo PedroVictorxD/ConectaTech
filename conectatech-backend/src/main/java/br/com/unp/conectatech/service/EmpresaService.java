@@ -81,6 +81,7 @@ public class EmpresaService {
                 .endereco(empresa.getEndereco())
                 .descricao(empresa.getDescricao())
                 .areaAtuacao(empresa.getAreaAtuacao())
+                .emailVerificado(Boolean.TRUE.equals(empresa.getEmailVerificado()))
                 .criadoEm(empresa.getCriadoEm() != null
                         ? empresa.getCriadoEm().format(FORMATTER)
                         : null)

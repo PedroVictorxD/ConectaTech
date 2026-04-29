@@ -45,22 +45,33 @@ public class AuthController {
     @Operation(summary = "Login", description = "Autentica o usuario e retorna um token JWT")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Email ou senha invalidos", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Email, senha ou confirmacao invalidos", content = @Content)
     })
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/forgot-password")
-    @Operation(summary = "Solicitar recuperacao de senha", description = "Gera um token de recuperacao para o email informado")
+    @PostMapping("/confirm-email")
+    @Operation(summary = "Confirmar email", description = "Confirma o email da conta usando o token enviado no cadastro")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Token de recuperacao gerado"),
+            @ApiResponse(responseCode = "200", description = "Email confirmado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Token invalido ou expirado", content = @Content)
+    })
+    public ResponseEntity<MessageResponse> confirmarEmail(@Valid @RequestBody ConfirmarEmailRequest request) {
+        authService.confirmarEmail(request.getToken());
+        return ResponseEntity.ok(new MessageResponse("Email confirmado com sucesso"));
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Solicitar recuperacao de senha", description = "Gera um token de recuperacao e envia por email")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Email de recuperacao enviado"),
             @ApiResponse(responseCode = "404", description = "Email nao encontrado", content = @Content)
     })
     public ResponseEntity<MessageResponse> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequest request) {
         authService.recuperarSenha(request);
-        return ResponseEntity.ok(new MessageResponse("Token de recuperacao gerado com sucesso"));
+        return ResponseEntity.ok(new MessageResponse("Email de recuperacao enviado com sucesso"));
     }
 
     @PutMapping("/reset-password")

@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
     Optional<Empresa> findByEmail(String email);
     Optional<Empresa> findByCnpj(String cnpj);
+    Optional<Empresa> findByTokenConfirmacaoEmail(String tokenConfirmacaoEmail);
+    Optional<Empresa> findByTokenRecuperacao(String tokenRecuperacao);
     boolean existsByEmail(String email);
     boolean existsByCnpj(String cnpj);
 }

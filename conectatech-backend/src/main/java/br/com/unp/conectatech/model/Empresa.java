@@ -38,6 +38,17 @@ public class Empresa {
 
     private String areaAtuacao;
 
+    @Builder.Default
+    private Boolean emailVerificado = Boolean.FALSE;
+
+    private String tokenConfirmacaoEmail;
+
+    private LocalDateTime tokenConfirmacaoExpiracao;
+
+    private String tokenRecuperacao;
+
+    private LocalDateTime tokenExpiracao;
+
     @Column(updatable = false)
     private LocalDateTime criadoEm;
 

@@ -33,6 +33,13 @@ public class Usuario {
     @Column(nullable = false)
     private Role role;
 
+    @Builder.Default
+    private Boolean emailVerificado = Boolean.FALSE;
+
+    private String tokenConfirmacaoEmail;
+
+    private LocalDateTime tokenConfirmacaoExpiracao;
+
     private String tokenRecuperacao;
 
     private LocalDateTime tokenExpiracao;

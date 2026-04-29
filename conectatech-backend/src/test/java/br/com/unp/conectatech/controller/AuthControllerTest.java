@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -30,6 +32,9 @@ class AuthControllerTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @MockBean
+    private br.com.unp.conectatech.service.EmailService emailService;
 
     @BeforeEach
     void setUp() {
@@ -52,8 +57,12 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.nome").value("Joao Silva"))
                 .andExpect(jsonPath("$.email").value("joao@email.com"))
                 .andExpect(jsonPath("$.role").value("STUDENT"))
+                .andExpect(jsonPath("$.emailVerificado").value(false))
                 .andExpect(jsonPath("$.curso").value("Ciencia da Computacao"))
                 .andExpect(jsonPath("$.id").exists());
+
+        String token = usuarioRepository.findByEmail("joao@email.com").orElseThrow().getTokenConfirmacaoEmail();
+        verify(emailService).enviarConfirmacaoEmail("joao@email.com", "Joao Silva", token, "aluno");
     }
 
     @Test
@@ -114,12 +123,7 @@ class AuthControllerTest {
 
     @Test
     void login_comCredenciaisValidas_retornaTokenEDados() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of(
-                        "nome", "Maria",
-                        "email", "maria@email.com",
-                        "senha", "senha123"))));
+        salvarUsuarioConfirmado("Maria", "maria@email.com", "senha123");
 
         String loginBody = objectMapper.writeValueAsString(Map.of(
                 "email", "maria@email.com",
@@ -137,12 +141,7 @@ class AuthControllerTest {
 
     @Test
     void login_comSenhaErrada_retorna400() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of(
-                        "nome", "Maria",
-                        "email", "maria@email.com",
-                        "senha", "senha123"))));
+        salvarUsuarioConfirmado("Maria", "maria@email.com", "senha123");
 
         String loginBody = objectMapper.writeValueAsString(Map.of(
                 "email", "maria@email.com",
@@ -153,6 +152,24 @@ class AuthControllerTest {
                         .content(loginBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Email ou senha inválidos"));
+    }
+
+    @Test
+    void login_comEmailNaoConfirmado_retorna400() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                        "nome", "Maria",
+                        "email", "maria@email.com",
+                        "senha", "senha123"))));
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "email", "maria@email.com",
+                                "senha", "senha123"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Confirme seu email antes de entrar"));
     }
 
     @Test
@@ -194,12 +211,7 @@ class AuthControllerTest {
 
     @Test
     void resetPassword_comTokenValido_retorna200() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of(
-                        "nome", "Ana",
-                        "email", "ana@email.com",
-                        "senha", "senha123"))));
+        salvarUsuarioConfirmado("Ana", "ana@email.com", "senha123");
 
         mockMvc.perform(post("/api/auth/forgot-password")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -232,5 +244,72 @@ class AuthControllerTest {
                                 "token", "token-invalido",
                                 "novaSenha", "novasenha456"))))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void confirmEmail_comTokenValido_retorna200() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                        "nome", "Joao",
+                        "email", "joao@email.com",
+                        "senha", "senha123"))));
+
+        String token = usuarioRepository.findByEmail("joao@email.com").orElseThrow().getTokenConfirmacaoEmail();
+
+        mockMvc.perform(post("/api/auth/confirm-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("token", token))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Email confirmado com sucesso"));
+    }
+
+    @Test
+    void confirmEmail_comTokenInvalido_retorna400() throws Exception {
+        mockMvc.perform(post("/api/auth/confirm-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("token", "token-invalido"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Token de confirmação inválido"));
+    }
+
+    @Test
+    void confirmEmail_comTokenExpirado_retorna400() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                        "nome", "Joao",
+                        "email", "joao@email.com",
+                        "senha", "senha123"))));
+
+        var usuario = usuarioRepository.findByEmail("joao@email.com").orElseThrow();
+        usuario.setTokenConfirmacaoExpiracao(usuario.getCriadoEm().minusMinutes(1));
+        usuarioRepository.save(usuario);
+
+        mockMvc.perform(post("/api/auth/confirm-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("token", usuario.getTokenConfirmacaoEmail()))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Token de confirmação expirado"));
+    }
+
+    @Test
+    void confirmEmail_semToken_retorna400() throws Exception {
+        mockMvc.perform(post("/api/auth/confirm-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.token").value("Token é obrigatório"));
+    }
+
+    private void salvarUsuarioConfirmado(String nome, String email, String senha) {
+        var usuario = br.com.unp.conectatech.model.Usuario.builder()
+                .nome(nome)
+                .email(email)
+                .senha(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode(senha))
+                .role(br.com.unp.conectatech.model.Role.STUDENT)
+                .emailVerificado(Boolean.TRUE)
+                .build();
+        usuarioRepository.save(usuario);
     }
 }

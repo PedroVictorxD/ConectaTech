@@ -1,9 +1,13 @@
 package br.com.unp.conectatech.controller;
 
 import br.com.unp.conectatech.dto.EmpresaDTO;
+import br.com.unp.conectatech.dto.ConfirmarEmailRequest;
 import br.com.unp.conectatech.dto.EmpresaLoginRequest;
 import br.com.unp.conectatech.dto.EmpresaLoginResponse;
 import br.com.unp.conectatech.dto.EmpresaRegistroRequest;
+import br.com.unp.conectatech.dto.AlterarSenhaRequest;
+import br.com.unp.conectatech.dto.MessageResponse;
+import br.com.unp.conectatech.dto.RecuperarSenhaRequest;
 import br.com.unp.conectatech.service.EmpresaAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,9 +44,42 @@ public class EmpresaAuthController {
     @Operation(summary = "Login empresa", description = "Autentica a empresa e retorna token JWT")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Login realizado"),
-            @ApiResponse(responseCode = "400", description = "Email ou senha invalidos", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Email, senha ou confirmacao invalidos", content = @Content)
     })
     public ResponseEntity<EmpresaLoginResponse> login(@Valid @RequestBody EmpresaLoginRequest request) {
         return ResponseEntity.ok(empresaAuthService.login(request));
+    }
+
+    @PostMapping("/confirm-email")
+    @Operation(summary = "Confirmar email da empresa", description = "Confirma o email da empresa usando o token enviado no cadastro")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Email confirmado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Token invalido ou expirado", content = @Content)
+    })
+    public ResponseEntity<MessageResponse> confirmarEmail(@Valid @RequestBody ConfirmarEmailRequest request) {
+        empresaAuthService.confirmarEmail(request.getToken());
+        return ResponseEntity.ok(new MessageResponse("Email confirmado com sucesso"));
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Solicitar recuperacao de senha da empresa", description = "Gera um token de recuperacao e envia por email")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Email de recuperacao enviado"),
+            @ApiResponse(responseCode = "404", description = "Email nao encontrado", content = @Content)
+    })
+    public ResponseEntity<MessageResponse> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequest request) {
+        empresaAuthService.recuperarSenha(request);
+        return ResponseEntity.ok(new MessageResponse("Email de recuperacao enviado com sucesso"));
+    }
+
+    @PutMapping("/reset-password")
+    @Operation(summary = "Alterar senha da empresa", description = "Altera a senha usando o token de recuperacao")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Token invalido ou expirado", content = @Content)
+    })
+    public ResponseEntity<MessageResponse> alterarSenha(@Valid @RequestBody AlterarSenhaRequest request) {
+        empresaAuthService.alterarSenha(request);
+        return ResponseEntity.ok(new MessageResponse("Senha alterada com sucesso"));
     }
 }

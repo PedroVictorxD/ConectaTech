@@ -33,6 +33,9 @@ public class UsuarioDTO {
     @Schema(description = "Role do usuario", example = "STUDENT")
     private String role;
 
+    @Schema(description = "Indica se o email do usuario ja foi confirmado", example = "false")
+    private Boolean emailVerificado;
+
     @Schema(description = "Data de criacao", example = "30/03/2026 14:30")
     private String criadoEm;
 }

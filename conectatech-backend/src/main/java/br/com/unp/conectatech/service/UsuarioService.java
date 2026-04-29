@@ -44,6 +44,7 @@ public class UsuarioService {
                 .curso(usuario.getCurso())
                 .periodo(usuario.getPeriodo())
                 .role(usuario.getRole().name())
+                .emailVerificado(Boolean.TRUE.equals(usuario.getEmailVerificado()))
                 .criadoEm(usuario.getCriadoEm() != null
                         ? usuario.getCriadoEm().format(FORMATTER)
                         : null)

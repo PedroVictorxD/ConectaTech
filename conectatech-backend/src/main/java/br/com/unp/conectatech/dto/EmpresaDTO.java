@@ -39,6 +39,9 @@ public class EmpresaDTO {
     @Schema(description = "Area de atuacao", example = "TI")
     private String areaAtuacao;
 
+    @Schema(description = "Indica se o email da empresa ja foi confirmado", example = "false")
+    private Boolean emailVerificado;
+
     @Schema(description = "Data de criacao", example = "06/04/2026 14:30")
     private String criadoEm;
 }
