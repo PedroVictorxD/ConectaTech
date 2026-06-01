@@ -54,14 +54,9 @@ class EmpresaAuthServiceTest {
         assertNotNull(empresa.getId());
         assertEquals("Empresa Teste", empresa.getNome());
         assertEquals("empresa@email.com", empresa.getEmail());
-        assertEquals(Boolean.FALSE, empresa.getEmailVerificado());
+        assertEquals(Boolean.TRUE, empresa.getEmailVerificado());
         assertTrue(passwordEncoder.matches("senha123",
                 empresaRepository.findByEmail("empresa@email.com").orElseThrow().getSenha()));
-        verify(emailService).enviarConfirmacaoEmail(
-                "empresa@email.com",
-                "Empresa Teste",
-                empresaRepository.findByEmail("empresa@email.com").orElseThrow().getTokenConfirmacaoEmail(),
-                "empresa");
     }
 
     @Test
@@ -152,57 +147,6 @@ class EmpresaAuthServiceTest {
         assertThrows(IllegalArgumentException.class, () -> empresaAuthService.alterarSenha(request));
     }
 
-    @Test
-    void login_comEmailNaoConfirmado_lancaException() {
-        salvarEmpresa("empresa@email.com", "senha123", false);
-
-        EmpresaLoginRequest request = new EmpresaLoginRequest();
-        request.setEmail("empresa@email.com");
-        request.setSenha("senha123");
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> empresaAuthService.login(request));
-        assertEquals("Confirme seu email antes de entrar", ex.getMessage());
-    }
-
-    @Test
-    void confirmarEmail_comTokenValido_confirmaEmpresa() {
-        EmpresaRegistroRequest request = new EmpresaRegistroRequest();
-        request.setNome("Empresa Teste");
-        request.setEmail("empresa@email.com");
-        request.setSenha("senha123");
-        request.setCnpj("12.345.678/0001-99");
-        request.setTelefone("84999990000");
-        empresaAuthService.registrar(request);
-
-        Empresa empresa = empresaRepository.findByEmail("empresa@email.com").orElseThrow();
-
-        empresaAuthService.confirmarEmail(empresa.getTokenConfirmacaoEmail());
-
-        Empresa atualizada = empresaRepository.findByEmail("empresa@email.com").orElseThrow();
-        assertEquals(Boolean.TRUE, atualizada.getEmailVerificado());
-        assertNull(atualizada.getTokenConfirmacaoEmail());
-        assertNull(atualizada.getTokenConfirmacaoExpiracao());
-    }
-
-    @Test
-    void confirmarEmail_comTokenInvalido_lancaException() {
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> empresaAuthService.confirmarEmail("token-invalido"));
-        assertEquals("Token de confirmação inválido", ex.getMessage());
-    }
-
-    @Test
-    void confirmarEmail_comTokenExpirado_lancaException() {
-        Empresa empresa = salvarEmpresa("empresa@email.com", "senha123", false);
-        empresa.setTokenConfirmacaoEmail("token-confirmacao");
-        empresa.setTokenConfirmacaoExpiracao(java.time.LocalDateTime.now().minusMinutes(1));
-        empresaRepository.save(empresa);
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> empresaAuthService.confirmarEmail("token-confirmacao"));
-        assertEquals("Token de confirmação expirado", ex.getMessage());
-    }
 
     private Empresa salvarEmpresa(String email, String senha, boolean emailVerificado) {
         return empresaRepository.save(Empresa.builder()

@@ -50,16 +50,7 @@ public class EmpresaAuthController {
         return ResponseEntity.ok(empresaAuthService.login(request));
     }
 
-    @PostMapping("/confirm-email")
-    @Operation(summary = "Confirmar email da empresa", description = "Confirma o email da empresa usando o token enviado no cadastro")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Email confirmado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Token invalido ou expirado", content = @Content)
-    })
-    public ResponseEntity<MessageResponse> confirmarEmail(@Valid @RequestBody ConfirmarEmailRequest request) {
-        empresaAuthService.confirmarEmail(request.getToken());
-        return ResponseEntity.ok(new MessageResponse("Email confirmado com sucesso"));
-    }
+
 
     @PostMapping("/forgot-password")
     @Operation(summary = "Solicitar recuperacao de senha da empresa", description = "Gera um token de recuperacao e envia por email")

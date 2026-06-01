@@ -66,7 +66,7 @@ class VagaSelecionadaServiceTest {
                 .titulo("Vaga 2")
                 .empresa("Empresa 2")
                 .url("https://example.com/2")
-                .fonte(FonteVaga.JOOBLE)
+                .fonte(FonteVaga.EMPRESA)
                 .build());
     }
 

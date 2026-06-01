@@ -49,7 +49,6 @@ public class EmpresaAuthService {
             throw new IllegalArgumentException("CNPJ já cadastrado");
         }
 
-        String tokenConfirmacao = UUID.randomUUID().toString();
         Empresa empresa = Empresa.builder()
                 .nome(request.getNome())
                 .email(request.getEmail())
@@ -59,13 +58,10 @@ public class EmpresaAuthService {
                 .endereco(request.getEndereco())
                 .descricao(request.getDescricao())
                 .areaAtuacao(request.getAreaAtuacao())
-                .emailVerificado(Boolean.FALSE)
-                .tokenConfirmacaoEmail(tokenConfirmacao)
-                .tokenConfirmacaoExpiracao(LocalDateTime.now().plusHours(emailConfirmationExpirationHours))
+                .emailVerificado(Boolean.TRUE)
                 .build();
 
         Empresa salva = empresaRepository.save(empresa);
-        emailService.enviarConfirmacaoEmail(salva.getEmail(), salva.getNome(), tokenConfirmacao, "empresa");
         return empresaService.toDTO(salva);
     }
 
@@ -114,19 +110,5 @@ public class EmpresaAuthService {
         empresaRepository.save(empresa);
     }
 
-    @Transactional
-    public void confirmarEmail(String token) {
-        Empresa empresa = empresaRepository.findByTokenConfirmacaoEmail(token)
-                .orElseThrow(() -> new IllegalArgumentException("Token de confirmação inválido"));
 
-        if (empresa.getTokenConfirmacaoExpiracao() == null
-                || empresa.getTokenConfirmacaoExpiracao().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Token de confirmação expirado");
-        }
-
-        empresa.setEmailVerificado(Boolean.TRUE);
-        empresa.setTokenConfirmacaoEmail(null);
-        empresa.setTokenConfirmacaoExpiracao(null);
-        empresaRepository.save(empresa);
-    }
 }

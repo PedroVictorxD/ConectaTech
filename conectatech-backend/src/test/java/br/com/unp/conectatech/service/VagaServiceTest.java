@@ -44,7 +44,7 @@ class VagaServiceTest {
                 .descricao("Vaga frontend React")
                 .localizacao("Natal, RN")
                 .url("https://example.com/2")
-                .fonte(FonteVaga.JOOBLE)
+                .fonte(FonteVaga.EMPRESA)
                 .build());
 
         vagaRepository.save(Vaga.builder()
@@ -53,7 +53,7 @@ class VagaServiceTest {
                 .descricao("Vaga RH")
                 .localizacao("Mossoro, RN")
                 .url("https://example.com/3")
-                .fonte(FonteVaga.JSOUP)
+                .fonte(FonteVaga.EMPRESA)
                 .build());
     }
 
@@ -90,40 +90,39 @@ class VagaServiceTest {
 
     @Test
     void listarPorFonte_filtraCorretamente() {
-        List<VagaDTO> vagas = vagaService.listarPorFonte(FonteVaga.JOOBLE);
+        List<VagaDTO> vagas = vagaService.listarPorFonte(FonteVaga.ADMIN);
         assertEquals(1, vagas.size());
-        assertEquals("Estagiario React", vagas.get(0).getTitulo());
+        assertEquals("Estagiario Java", vagas.get(0).getTitulo());
     }
 
     @Test
     void buscarComFiltros_porBusca_filtraPorTitulo() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros("Java", null, null);
+        List<VagaDTO> vagas = vagaService.buscarComFiltros("Java", null, null, null, null);
         assertEquals(1, vagas.size());
         assertEquals("Estagiario Java", vagas.get(0).getTitulo());
     }
 
     @Test
     void buscarComFiltros_porLocalizacao_filtra() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros(null, "Mossoro", null);
+        List<VagaDTO> vagas = vagaService.buscarComFiltros(null, "Mossoro", null, null, null);
         assertEquals(2, vagas.size());
     }
 
     @Test
     void buscarComFiltros_porFonte_filtra() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros(null, null, "JSOUP");
-        assertEquals(1, vagas.size());
-        assertEquals("Analista RH", vagas.get(0).getTitulo());
+        List<VagaDTO> vagas = vagaService.buscarComFiltros(null, null, "EMPRESA", null, null);
+        assertEquals(2, vagas.size());
     }
 
     @Test
     void buscarComFiltros_fonteInvalida_retornaTodas() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros(null, null, "INVALIDA");
+        List<VagaDTO> vagas = vagaService.buscarComFiltros(null, null, "INVALIDA", null, null);
         assertEquals(3, vagas.size());
     }
 
     @Test
     void buscarComFiltros_combinado_filtra() {
-        List<VagaDTO> vagas = vagaService.buscarComFiltros("Estagiario", "Mossoro", null);
+        List<VagaDTO> vagas = vagaService.buscarComFiltros("Estagiario", "Mossoro", null, null, null);
         assertEquals(1, vagas.size());
         assertEquals("Estagiario Java", vagas.get(0).getTitulo());
     }

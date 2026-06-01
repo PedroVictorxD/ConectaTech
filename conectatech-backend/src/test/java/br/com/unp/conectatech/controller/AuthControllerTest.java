@@ -57,12 +57,9 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.nome").value("Joao Silva"))
                 .andExpect(jsonPath("$.email").value("joao@email.com"))
                 .andExpect(jsonPath("$.role").value("STUDENT"))
-                .andExpect(jsonPath("$.emailVerificado").value(false))
+                .andExpect(jsonPath("$.emailVerificado").value(true))
                 .andExpect(jsonPath("$.curso").value("Ciencia da Computacao"))
                 .andExpect(jsonPath("$.id").exists());
-
-        String token = usuarioRepository.findByEmail("joao@email.com").orElseThrow().getTokenConfirmacaoEmail();
-        verify(emailService).enviarConfirmacaoEmail("joao@email.com", "Joao Silva", token, "aluno");
     }
 
     @Test
@@ -154,23 +151,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.message").value("Email ou senha inválidos"));
     }
 
-    @Test
-    void login_comEmailNaoConfirmado_retorna400() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of(
-                        "nome", "Maria",
-                        "email", "maria@email.com",
-                        "senha", "senha123"))));
 
-        mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of(
-                                "email", "maria@email.com",
-                                "senha", "senha123"))))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Confirme seu email antes de entrar"));
-    }
 
     @Test
     void login_comEmailInexistente_retorna400() throws Exception {
@@ -246,61 +227,6 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void confirmEmail_comTokenValido_retorna200() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of(
-                        "nome", "Joao",
-                        "email", "joao@email.com",
-                        "senha", "senha123"))));
-
-        String token = usuarioRepository.findByEmail("joao@email.com").orElseThrow().getTokenConfirmacaoEmail();
-
-        mockMvc.perform(post("/api/auth/confirm-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of("token", token))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Email confirmado com sucesso"));
-    }
-
-    @Test
-    void confirmEmail_comTokenInvalido_retorna400() throws Exception {
-        mockMvc.perform(post("/api/auth/confirm-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of("token", "token-invalido"))))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Token de confirmação inválido"));
-    }
-
-    @Test
-    void confirmEmail_comTokenExpirado_retorna400() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of(
-                        "nome", "Joao",
-                        "email", "joao@email.com",
-                        "senha", "senha123"))));
-
-        var usuario = usuarioRepository.findByEmail("joao@email.com").orElseThrow();
-        usuario.setTokenConfirmacaoExpiracao(usuario.getCriadoEm().minusMinutes(1));
-        usuarioRepository.save(usuario);
-
-        mockMvc.perform(post("/api/auth/confirm-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of("token", usuario.getTokenConfirmacaoEmail()))))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Token de confirmação expirado"));
-    }
-
-    @Test
-    void confirmEmail_semToken_retorna400() throws Exception {
-        mockMvc.perform(post("/api/auth/confirm-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of())))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors.token").value("Token é obrigatório"));
-    }
 
     private void salvarUsuarioConfirmado(String nome, String email, String senha) {
         var usuario = br.com.unp.conectatech.model.Usuario.builder()

@@ -43,7 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/empresa/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs/my-selections").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/jobs", "/api/jobs/{id}", "/api/jobs/search-external").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/jobs", "/api/jobs/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/jobs/*/interesse").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/jobs/*/interesse").authenticated()
                         .requestMatchers("/api/redator/**").hasRole("REDATOR")

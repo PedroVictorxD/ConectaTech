@@ -1,9 +1,9 @@
 package br.com.unp.conectatech.controller;
 
+import br.com.unp.conectatech.dto.MessageResponse;
 import br.com.unp.conectatech.dto.SelecionarVagaRequest;
 import br.com.unp.conectatech.dto.VagaDTO;
 import br.com.unp.conectatech.service.InteresseService;
-import br.com.unp.conectatech.service.JoobleService;
 import br.com.unp.conectatech.service.VagaSelecionadaService;
 import br.com.unp.conectatech.service.VagaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,8 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import br.com.unp.conectatech.dto.MessageResponse;
-
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -29,47 +28,33 @@ public class VagaController {
 
     private final VagaService vagaService;
     private final VagaSelecionadaService vagaSelecionadaService;
-    private final JoobleService joobleService;
     private final InteresseService interesseService;
 
     public VagaController(VagaService vagaService, VagaSelecionadaService vagaSelecionadaService,
-            JoobleService joobleService, InteresseService interesseService) {
+            InteresseService interesseService) {
         this.vagaService = vagaService;
         this.vagaSelecionadaService = vagaSelecionadaService;
-        this.joobleService = joobleService;
         this.interesseService = interesseService;
     }
 
     @GetMapping
-    @Operation(summary = "Listar vagas", description = "Lista todas as vagas com filtros opcionais por texto, localizacao e fonte")
-    @ApiResponse(responseCode = "200", description = "Lista de vagas retornada")
-    public ResponseEntity<List<VagaDTO>> listarTodas(
+    @Operation(summary = "Listar vagas", description = "Lista vagas com filtros opcionais: texto, localizacao, fonte e datas de publicacao")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de vagas retornada"),
+            @ApiResponse(responseCode = "400", description = "Formato de data invalido — use yyyy-MM-dd", content = @Content)
+    })
+    public ResponseEntity<?> listarTodas(
             @Parameter(description = "Texto para buscar em titulo, empresa e descricao") @RequestParam(required = false) String busca,
             @Parameter(description = "Filtrar por localizacao (ex: Mossoro)") @RequestParam(required = false) String localizacao,
-            @Parameter(description = "Filtrar por fonte: JOOBLE, JSOUP ou ADMIN") @RequestParam(required = false) String fonte) {
-        List<VagaDTO> vagas;
-        if ((busca != null && !busca.isBlank()) || (localizacao != null && !localizacao.isBlank()) || (fonte != null && !fonte.isBlank())) {
-            vagas = vagaService.buscarComFiltros(busca, localizacao, fonte);
-        } else {
-            vagas = vagaService.listarTodas();
+            @Parameter(description = "Filtrar por fonte: ADMIN ou EMPRESA") @RequestParam(required = false) String fonte,
+            @Parameter(description = "Data inicio no formato yyyy-MM-dd") @RequestParam(required = false) String dataInicio,
+            @Parameter(description = "Data fim no formato yyyy-MM-dd") @RequestParam(required = false) String dataFim) {
+        try {
+            return ResponseEntity.ok(vagaService.buscarComFiltros(busca, localizacao, fonte, dataInicio, dataFim));
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Formato de data invalido. Use yyyy-MM-dd (ex: 2026-01-31)"));
         }
-        return ResponseEntity.ok(vagas);
-    }
-
-    @GetMapping("/search-external")
-    @Operation(summary = "Buscar vagas externas", description = "Importa vagas do Jooble e retorna resultados do banco")
-    @ApiResponse(responseCode = "200", description = "Vagas externas importadas e retornadas")
-    public ResponseEntity<List<VagaDTO>> buscarExternas(
-            @Parameter(description = "Palavras-chave para busca") @RequestParam(defaultValue = "estagio") String keywords,
-            @Parameter(description = "Localizacao da busca") @RequestParam(defaultValue = "Mossoro, RN") String location) {
-        joobleService.buscarVagasJooble(keywords, location);
-        List<VagaDTO> vagas;
-        if (!keywords.isBlank()) {
-            vagas = vagaService.buscarPorTitulo(keywords);
-        } else {
-            vagas = vagaService.listarTodas();
-        }
-        return ResponseEntity.ok(vagas);
     }
 
     @GetMapping("/{id}")
@@ -114,7 +99,8 @@ public class VagaController {
             @ApiResponse(responseCode = "200", description = "Vaga removida das selecionadas"),
             @ApiResponse(responseCode = "401", description = "Token JWT ausente ou invalido", content = @Content)
     })
-    public ResponseEntity<MessageResponse> removerSelecionada(@Parameter(description = "ID da vaga") @PathVariable Long vagaId,
+    public ResponseEntity<MessageResponse> removerSelecionada(
+            @Parameter(description = "ID da vaga") @PathVariable Long vagaId,
             Authentication authentication) {
         String email = authentication.getName();
         vagaSelecionadaService.removerSelecionada(email, vagaId);

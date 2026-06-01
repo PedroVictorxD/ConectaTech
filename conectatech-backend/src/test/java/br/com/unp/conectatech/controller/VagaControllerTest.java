@@ -67,6 +67,7 @@ class VagaControllerTest {
                 .curso("CC")
                 .periodo("6")
                 .role(Role.STUDENT)
+                .emailVerificado(Boolean.TRUE)
                 .build();
         usuarioRepository.save(student);
 

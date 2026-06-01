@@ -34,7 +34,7 @@ public class VagaDTO {
     @Schema(description = "URL da vaga original", example = "https://exemplo.com/vaga/123")
     private String url;
 
-    @Schema(description = "Fonte da vaga", example = "JOOBLE")
+    @Schema(description = "Fonte da vaga", example = "ADMIN")
     private String fonte;
 
     @Schema(description = "Nome da empresa vinculada", example = "Tech Solutions LTDA")

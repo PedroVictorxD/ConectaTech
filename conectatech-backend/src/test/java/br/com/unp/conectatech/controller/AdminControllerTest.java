@@ -66,6 +66,7 @@ class AdminControllerTest {
                 .email("admin@email.com")
                 .senha(passwordEncoder.encode("admin123"))
                 .role(Role.ADMIN)
+                .emailVerificado(Boolean.TRUE)
                 .build();
         usuarioRepository.save(admin);
 
@@ -76,6 +77,7 @@ class AdminControllerTest {
                 .curso("CC")
                 .periodo("6")
                 .role(Role.STUDENT)
+                .emailVerificado(Boolean.TRUE)
                 .build();
         usuarioRepository.save(student);
 

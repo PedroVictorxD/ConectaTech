@@ -48,15 +48,8 @@ class AuthServiceTest {
         assertEquals("Joao", usuario.getNome());
         assertEquals("joao@email.com", usuario.getEmail());
         assertEquals(Role.STUDENT, usuario.getRole());
-        assertEquals(Boolean.FALSE, usuario.getEmailVerificado());
-        assertNotNull(usuario.getTokenConfirmacaoEmail());
-        assertNotNull(usuario.getTokenConfirmacaoExpiracao());
+        assertEquals(Boolean.TRUE, usuario.getEmailVerificado());
         assertTrue(passwordEncoder.matches("senha123", usuario.getSenha()));
-        verify(emailService).enviarConfirmacaoEmail(
-                "joao@email.com",
-                "Joao",
-                usuario.getTokenConfirmacaoEmail(),
-                "aluno");
     }
 
     @Test
@@ -70,7 +63,6 @@ class AuthServiceTest {
     @Test
     void login_comCredenciaisValidas_retornaToken() {
         authService.registrar("Joao", "joao@email.com", "senha123", "CC", "6");
-        confirmarUsuario("joao@email.com");
 
         LoginRequest request = new LoginRequest();
         request.setEmail("joao@email.com");
@@ -87,7 +79,6 @@ class AuthServiceTest {
     @Test
     void login_comSenhaErrada_lancaException() {
         authService.registrar("Joao", "joao@email.com", "senha123", "CC", "6");
-        confirmarUsuario("joao@email.com");
 
         LoginRequest request = new LoginRequest();
         request.setEmail("joao@email.com");
@@ -105,17 +96,6 @@ class AuthServiceTest {
         assertThrows(IllegalArgumentException.class, () -> authService.login(request));
     }
 
-    @Test
-    void login_comEmailNaoConfirmado_lancaException() {
-        authService.registrar("Joao", "joao@email.com", "senha123", "CC", "6");
-
-        LoginRequest request = new LoginRequest();
-        request.setEmail("joao@email.com");
-        request.setSenha("senha123");
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> authService.login(request));
-        assertEquals("Confirme seu email antes de entrar", ex.getMessage());
-    }
 
     @Test
     void recuperarSenha_geraToken() {
@@ -188,35 +168,7 @@ class AuthServiceTest {
         assertThrows(IllegalArgumentException.class, () -> authService.alterarSenha(request));
     }
 
-    @Test
-    void confirmarEmail_comTokenValido_confirmaUsuario() {
-        Usuario usuario = authService.registrar("Joao", "joao@email.com", "senha123", "CC", "6");
 
-        authService.confirmarEmail(usuario.getTokenConfirmacaoEmail());
-
-        Usuario atualizado = usuarioRepository.findByEmail("joao@email.com").orElseThrow();
-        assertEquals(Boolean.TRUE, atualizado.getEmailVerificado());
-        assertNull(atualizado.getTokenConfirmacaoEmail());
-        assertNull(atualizado.getTokenConfirmacaoExpiracao());
-    }
-
-    @Test
-    void confirmarEmail_comTokenInvalido_lancaException() {
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> authService.confirmarEmail("token-invalido"));
-        assertEquals("Token de confirmação inválido", ex.getMessage());
-    }
-
-    @Test
-    void confirmarEmail_comTokenExpirado_lancaException() {
-        Usuario usuario = authService.registrar("Joao", "joao@email.com", "senha123", "CC", "6");
-        usuario.setTokenConfirmacaoExpiracao(usuario.getCriadoEm().minusMinutes(1));
-        usuarioRepository.save(usuario);
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> authService.confirmarEmail(usuario.getTokenConfirmacaoEmail()));
-        assertEquals("Token de confirmação expirado", ex.getMessage());
-    }
 
     private void confirmarUsuario(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email).orElseThrow();

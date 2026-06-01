@@ -51,6 +51,7 @@ class SecurityTest {
                 .email("aluno@email.com")
                 .senha(passwordEncoder.encode("senha123"))
                 .role(Role.STUDENT)
+                .emailVerificado(Boolean.TRUE)
                 .build();
         usuarioRepository.save(student);
 
@@ -86,14 +87,6 @@ class SecurityTest {
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/admin/jobs")
-                .header("Authorization", "Bearer " + studentToken))
-                .andExpect(status().isForbidden());
-
-        mockMvc.perform(post("/api/admin/import-scraper")
-                .header("Authorization", "Bearer " + studentToken))
-                .andExpect(status().isForbidden());
-
-        mockMvc.perform(post("/api/admin/import-jooble")
                 .header("Authorization", "Bearer " + studentToken))
                 .andExpect(status().isForbidden());
     }

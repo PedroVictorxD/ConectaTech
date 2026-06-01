@@ -83,21 +83,7 @@ public class AuthService {
         usuarioRepository.save(usuario);
     }
 
-    @Transactional
-    public void confirmarEmail(String token) {
-        Usuario usuario = usuarioRepository.findByTokenConfirmacaoEmail(token)
-                .orElseThrow(() -> new IllegalArgumentException("Token de confirmação inválido"));
 
-        if (usuario.getTokenConfirmacaoExpiracao() == null
-                || usuario.getTokenConfirmacaoExpiracao().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Token de confirmação expirado");
-        }
-
-        usuario.setEmailVerificado(Boolean.TRUE);
-        usuario.setTokenConfirmacaoEmail(null);
-        usuario.setTokenConfirmacaoExpiracao(null);
-        usuarioRepository.save(usuario);
-    }
 
     @Transactional
     public Usuario registrar(String nome, String email, String senha, String curso, String periodo) {
@@ -105,7 +91,6 @@ public class AuthService {
             throw new IllegalArgumentException("Email já cadastrado");
         }
 
-        String tokenConfirmacao = UUID.randomUUID().toString();
         Usuario usuario = Usuario.builder()
                 .nome(nome)
                 .email(email)
@@ -113,13 +98,24 @@ public class AuthService {
                 .curso(curso)
                 .periodo(periodo)
                 .role(Role.STUDENT)
-                .emailVerificado(Boolean.FALSE)
-                .tokenConfirmacaoEmail(tokenConfirmacao)
-                .tokenConfirmacaoExpiracao(LocalDateTime.now().plusHours(emailConfirmationExpirationHours))
+                .emailVerificado(Boolean.TRUE)
                 .build();
 
-        Usuario salvo = usuarioRepository.save(usuario);
-        emailService.enviarConfirmacaoEmail(salvo.getEmail(), salvo.getNome(), tokenConfirmacao, "aluno");
-        return salvo;
+        return usuarioRepository.save(usuario);
+    }
+
+
+
+    @Transactional
+    public void alterarSenhaLogado(String email, AlterarSenhaLogadoRequest request) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        if (!passwordEncoder.matches(request.getSenhaAtual(), usuario.getSenha())) {
+            throw new IllegalArgumentException("Senha atual incorreta");
+        }
+
+        usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
+        usuarioRepository.save(usuario);
     }
 }

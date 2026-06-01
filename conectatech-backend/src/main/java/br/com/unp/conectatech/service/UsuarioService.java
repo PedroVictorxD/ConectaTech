@@ -50,4 +50,11 @@ public class UsuarioService {
                         : null)
                 .build();
     }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void deletarConta(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+        usuarioRepository.delete(usuario);
+    }
 }

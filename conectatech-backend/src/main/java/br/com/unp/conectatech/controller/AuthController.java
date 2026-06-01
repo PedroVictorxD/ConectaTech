@@ -52,16 +52,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/confirm-email")
-    @Operation(summary = "Confirmar email", description = "Confirma o email da conta usando o token enviado no cadastro")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Email confirmado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Token invalido ou expirado", content = @Content)
-    })
-    public ResponseEntity<MessageResponse> confirmarEmail(@Valid @RequestBody ConfirmarEmailRequest request) {
-        authService.confirmarEmail(request.getToken());
-        return ResponseEntity.ok(new MessageResponse("Email confirmado com sucesso"));
-    }
+
 
     @PostMapping("/forgot-password")
     @Operation(summary = "Solicitar recuperacao de senha", description = "Gera um token de recuperacao e envia por email")
@@ -84,4 +75,5 @@ public class AuthController {
         authService.alterarSenha(request);
         return ResponseEntity.ok(new MessageResponse("Senha alterada com sucesso"));
     }
+
 }

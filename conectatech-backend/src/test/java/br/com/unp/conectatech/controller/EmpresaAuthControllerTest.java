@@ -38,13 +38,17 @@ class EmpresaAuthControllerTest {
     private EmpresaRepository empresaRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private br.com.unp.conectatech.repository.VagaRepository vagaRepository;
+
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @MockBean
     private br.com.unp.conectatech.service.EmailService emailService;
 
     @BeforeEach
     void setUp() {
+        vagaRepository.deleteAll();
         empresaRepository.deleteAll();
     }
 
@@ -63,11 +67,8 @@ class EmpresaAuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome").value("Empresa Teste"))
                 .andExpect(jsonPath("$.email").value("empresa@email.com"))
-                .andExpect(jsonPath("$.emailVerificado").value(false))
+                .andExpect(jsonPath("$.emailVerificado").value(true))
                 .andExpect(jsonPath("$.id").exists());
-
-        String token = empresaRepository.findByEmail("empresa@email.com").orElseThrow().getTokenConfirmacaoEmail();
-        verify(emailService).enviarConfirmacaoEmail("empresa@email.com", "Empresa Teste", token, "empresa");
     }
 
     @Test
@@ -152,78 +153,9 @@ class EmpresaAuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void login_comEmailNaoConfirmado_retorna400() throws Exception {
-        salvarEmpresa("empresa@email.com", "senha123", false);
 
-        mockMvc.perform(post("/api/empresa/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of(
-                                "email", "empresa@email.com",
-                                "senha", "senha123"))))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Confirme seu email antes de entrar"));
-    }
 
-    @Test
-    void confirmEmail_comTokenValido_retorna200() throws Exception {
-        mockMvc.perform(post("/api/empresa/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of(
-                        "nome", "Empresa Teste",
-                        "email", "empresa@email.com",
-                        "senha", "senha123",
-                        "cnpj", "12.345.678/0001-99",
-                        "telefone", "84999990000"))));
 
-        String token = empresaRepository.findByEmail("empresa@email.com").orElseThrow().getTokenConfirmacaoEmail();
-
-        mockMvc.perform(post("/api/empresa/auth/confirm-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of("token", token))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Email confirmado com sucesso"));
-    }
-
-    @Test
-    void confirmEmail_comTokenInvalido_retorna400() throws Exception {
-        mockMvc.perform(post("/api/empresa/auth/confirm-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of("token", "token-invalido"))))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Token de confirmação inválido"));
-    }
-
-    @Test
-    void confirmEmail_comTokenExpirado_retorna400() throws Exception {
-        mockMvc.perform(post("/api/empresa/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of(
-                        "nome", "Empresa Teste",
-                        "email", "empresa@email.com",
-                        "senha", "senha123",
-                        "cnpj", "12.345.678/0001-99",
-                        "telefone", "84999990000"))));
-
-        var empresa = empresaRepository.findByEmail("empresa@email.com").orElseThrow();
-        empresa.setTokenConfirmacaoExpiracao(empresa.getCriadoEm().minusMinutes(1));
-        empresaRepository.save(empresa);
-
-        mockMvc.perform(post("/api/empresa/auth/confirm-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of("token", empresa.getTokenConfirmacaoEmail()))))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Token de confirmação expirado"));
-    }
-
-    @Test
-    void confirmEmail_semToken_retorna400() throws Exception {
-        mockMvc.perform(post("/api/empresa/auth/confirm-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of())))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors.token").value("Token é obrigatório"));
-    }
 
     private Empresa salvarEmpresa(String email, String senha, boolean emailVerificado) {
         return empresaRepository.save(Empresa.builder()
