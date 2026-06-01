@@ -28,8 +28,8 @@ public interface VagaRepository extends JpaRepository<Vaga, Long> {
                      "(COALESCE(:localizacao, '') = '' OR LOWER(v.localizacao) LIKE LOWER(CONCAT('%', :localizacao, '%'))) AND "
                      +
                      "(:fonte IS NULL OR v.fonte = :fonte) AND " +
-                     "(:dataInicio IS NULL OR v.dataPublicacao >= :dataInicio) AND " +
-                     "(:dataFim IS NULL OR v.dataPublicacao <= :dataFim)")
+                     "(CAST(:dataInicio AS timestamp) IS NULL OR v.dataPublicacao >= :dataInicio) AND " +
+                     "(CAST(:dataFim AS timestamp) IS NULL OR v.dataPublicacao <= :dataFim)")
        List<Vaga> buscarComFiltros(
                      @Param("busca") String busca,
                      @Param("localizacao") String localizacao,
